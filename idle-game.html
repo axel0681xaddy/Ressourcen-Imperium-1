@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ressourcen-Imperium - Ein IDLE-Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .game-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .resources-panel {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .main-panel {
+            flex: 2;
+            min-width: 400px;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .resource-display {
+            font-size: 1.2em;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .resource-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            display: inline-block;
+            border-radius: 4px;
+            vertical-align: middle;
+        }
+        
+        .coin-icon { background-color: #f1c40f; }
+        .wood-icon { background-color: #8b4513; }
+        .stone-icon { background-color: #7f8c8d; }
+        .iron-icon { background-color: #95a5a6; }
+        .copper-icon { background-color: #e67e22; }
+        .plank-icon { background-color: #d35400; }
+        .brick-icon { background-color: #c0392b; }
+        .tool-icon { background-color: #34495e; }
+        .jewelry-icon { background-color: #9b59b6; }
+        
+        .generator, .upgrade, .converter {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats {
+            margin-top: 10px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .achievement {
+            background-color: #f1c40f;
+            color: #34495e;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: inline-block;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: #ecf0f1;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #2ecc71;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .cost-display {
+            font-size: 0.9em;
+        }
+        
+        .cost-item {
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .production-chain {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .production-chain-item {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+        }
+        
+        .arrow {
+            font-size: 1.5em;
+            margin: 0 10px;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .resources-panel, .main-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Ressourcen-Imperium</h1>
+    <div class="container">
+        <div class="resources-panel">
+            <div class="game-section">
+                <h2>Ressourcen</h2>
+                <!-- Primary Resources -->
+                <div id="primary-resources">
+                    <h3>Primäre Ressourcen</h3>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon coin-icon"></span>
+                            <span id="coins">0</span> Münzen
+                        </div>
+                        <div><span id="coins-per-second">0.0</span>/s</div>
+                    </div>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon wood-icon"></span>
+                            <span id="wood">0</span> Holz
+                        </div>
+                        <div><span id="wood-per-second">0.0</span>/s</div>
+                    </div>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon stone-icon"></span>
+                            <span id="stone">0</span> Stein
+                        </div>
+                        <div><span id="stone-per-second">0.0</span>/s</div>
+                    </div>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon iron-icon"></span>
+                            <span id="iron">0</span> Eisen
+                        </div>
+                        <div><span id="iron-per-second">0.0</span>/s</div>
+                    </div>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon copper-icon"></span>
+                            <span id="copper">0</span> Kupfer
+                        </div>
+                        <div><span id="copper-per-second">0.0</span>/s</div>
+                    </div>
+                </div>
+                
+                <!-- Secondary Resources -->
+                <div id="secondary-resources">
+                    <h3>Sekundäre Ressourcen</h3>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon plank-icon"></span>
+                            <span id="planks">0</span> Bretter
+                        </div>
+                        <div><span id="planks-per-second">0.0</span>/s</div>
+                    </div>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon brick-icon"></span>
+                            <span id="bricks">0</span> Ziegel
+                        </div>
+                        <div><span id="bricks-per-second">0.0</span>/s</div>
+                    </div>
+                </div>
+                
+                <!-- Tertiary Resources -->
+                <div id="tertiary-resources">
+                    <h3>Hochwertige Güter</h3>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon tool-icon"></span>
+                            <span id="tools">0</span> Werkzeuge
+                        </div>
+                        <div><span id="tools-per-second">0.0</span>/s</div>
+                    </div>
+                    <div class="resource-display">
+                        <div>
+                            <span class="resource-icon jewelry-icon"></span>
+                            <span id="jewelry">0</span> Schmuck
+                        </div>
+                        <div><span id="jewelry-per-second">0.0</span>/s</div>
+                    </div>
+                </div>
+                
+                <button id="click-btn">Sammeln</button>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+                
+                <div class="stats">
+                    <div>Gesamtklicks: <span id="total-clicks">0</span></div>
+                    <div>Spielzeit: <span id="play-time">0m 0s</span></div>
+                </div>
+            </div>
+            
+            <div class="game-section">
+                <h2>Produktionsketten</h2>
+                <div id="production-chains">
+                    <!-- Plank Production Chain -->
+                    <div class="production-chain">
+                        <div class="production-chain-item">
+                            <span class="resource-icon wood-icon"></span> 
+                            <span>2 Holz</span>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="production-chain-item">
+                            <span class="resource-icon plank-icon"></span>
+                            <span>1 Brett</span>
+                        </div>
+                        <div class="stats">Wert: 1.5x</div>
+                    </div>
+                    
+                    <!-- Brick Production Chain -->
+                    <div class="production-chain">
+                        <div class="production-chain-item">
+                            <span class="resource-icon stone-icon"></span>
+                            <span>3 Stein</span>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="production-chain-item">
+                            <span class="resource-icon brick-icon"></span>
+                            <span>1 Ziegel</span>
+                        </div>
+                        <div class="stats">Wert: 2x</div>
+                    </div>
+                    
+                    <!-- Tool Production Chain -->
+                    <div class="production-chain">
+                        <div class="production-chain-item">
+                            <span class="resource-icon iron-icon"></span>
+                            <span>2 Eisen</span>
+                        </div>
+                        <div class="arrow">+</div>
+                        <div class="production-chain-item">
+                            <span class="resource-icon plank-icon"></span>
+                            <span>1 Brett</span>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="production-chain-item">
+                            <span class="resource-icon tool-icon"></span>
+                            <span>1 Werkzeug</span>
+                        </div>
+                        <div class="stats">Wert: 3x</div>
+                    </div>
+                    
+                    <!-- Jewelry Production Chain -->
+                    <div class="production-chain">
+                        <div class="production-chain-item">
+                            <span class="resource-icon copper-icon"></span>
+                            <span>2 Kupfer</span>
+                        </div>
+                        <div class="arrow">+</div>
+                        <div class="production-chain-item">
+                            <span class="resource-icon iron-icon"></span>
+                            <span>1 Eisen</span>
+                        </div>
+                        <div class="arrow">→</div>
+                        <div class="production-chain-item">
+                            <span class="resource-icon jewelry-icon"></span>
+                            <span>1 Schmuck</span>
+                        </div>
+                        <div class="stats">Wert: 4x</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-section">
+                <h2>Errungenschaften</h2>
+                <div id="achievements-container">
+                    <!-- Achievements will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-panel">
+            <div class="tabs">
+                <div class="tab active" data-tab="resource-generators">Ressourcen-Sammler</div>
+                <div class="tab" data-tab="converters">Konverter</div>
+                <div class="tab" data-tab="upgrades">Verbesserungen</div>
+                <div class="tab" data-tab="prestige">Prestige</div>
+            </div>
+            
+            <div class="game-section">
+                <div class="tab-content active" id="resource-generators">
+                    <h2>Ressourcen-Sammler</h2>
+                    <div id="resource-generators-container">
+                        <!-- Resource Generators will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="converters">
+                    <h2>Ressourcen-Konverter</h2>
+                    <div id="converters-container">
+                        <!-- Converters will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="upgrades">
+                    <h2>Verbesserungen</h2>
+                    <div id="upgrades-container">
+                        <!-- Upgrades will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="prestige">
+                    <h2>Prestige</h2>
+                    <p>Wenn du genug Ressourcen gesammelt hast, kannst du ein Prestige durchführen, um Bonus-Multiplikatoren zu erhalten.</p>
+                    <div class="resource-display">
+                        Prestige-Punkte beim Reset: <span id="prestige-points">0</span>
+                    </div>
+                    <button id="prestige-btn" disabled>Prestige durchführen (Benötigt 1.000.000 Münzen)</button>
+                    
+                    <div class="stats">
+                        <div>Aktueller Prestige-Multiplikator: <span id="prestige-multiplier">1.0</span>x</div>
+                        <div>Anzahl Prestige-Resets: <span id="prestige-resets">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game state
+        let gameState = {
+            resources: {
+                coins: 0,
+                wood: 0,
+                stone: 0,
+                iron: 0,
+                copper: 0,
+                planks: 0,
+                bricks: 0,
+                tools: 0,
+                jewelry: 0
+            },
+            production: {
+                coins: 0,
+                wood: 0,
+                stone: 0,
+                iron: 0,
+                copper: 0,
+                planks: 0,
+                bricks: 0,
+                tools: 0,
+                jewelry: 0
+            },
+            clickValue: {
+                coins: 1,
+                wood: 1,
+                stone: 0,
+                iron: 0,
+                copper: 0
+            },
+            totalClicks: 0,
+            startTime: Date.now(),
+            lastSaveTime: Date.now(),
+            prestigePoints: 0,
+            prestigeMultiplier: 1,
+            prestigeResets: 0,
+            unlockedResources: {
+                coins: true,
+                wood: true,
+                stone: false,
+                iron: false,
+                copper: false,
+                planks: false,
+                bricks: false,
+                tools: false,
+                jewelry: false
+            },
+            // Generator definitions
+            generators: [
+                // Primary resource generators
+                { id: 'woodcutter', name: 'Holzfäller', resource: 'wood', baseCost: { coins: 10 }, cost: { coins: 10 }, baseOutput: 0.5, amount: 0, unlocked: true },
+                { id: 'miner', name: 'Steinmetz', resource: 'stone', baseCost: { coins: 50, wood: 20 }, cost: { coins: 50, wood: 20 }, baseOutput: 0.3, amount: 0, unlocked: false },
+                { id: 'ironMiner', name: 'Eisenmine', resource: 'iron', baseCost: { coins: 200, wood: 50, stone: 50 }, cost: { coins: 200, wood: 50, stone: 50 }, baseOutput: 0.2, amount: 0, unlocked: false },
+                { id: 'copperMiner', name: 'Kupfermine', resource: 'copper', baseCost: { coins: 300, wood: 100, stone: 80 }, cost: { coins: 300, wood: 100, stone: 80 }, baseOutput: 0.1, amount: 0, unlocked: false },
+                
+                { id: 'market', name: 'Marktstand', resource: 'coins', baseCost: { wood: 30 }, cost: { wood: 30 }, baseOutput: 0.5, amount: 0, unlocked: false },
+                { id: 'bank', name: 'Bank', resource: 'coins', baseCost: { wood: 100, stone: 50 }, cost: { wood: 100, stone: 50 }, baseOutput: 2, amount: 0, unlocked: false }
+            ],
+            
+            // Converter definitions
+            converters: [
+                { id: 'sawmill', name: 'Sägewerk', input: { wood: 2 }, output: { planks: 1 }, baseCost: { coins: 100, wood: 50 }, cost: { coins: 100, wood: 50 }, baseSpeed: 0.2, amount: 0, unlocked: false },
+                { id: 'brickmaker', name: 'Ziegelei', input: { stone: 3 }, output: { bricks: 1 }, baseCost: { coins: 200, wood: 80, stone: 40 }, cost: { coins: 200, wood: 80, stone: 40 }, baseSpeed: 0.15, amount: 0, unlocked: false },
+                { id: 'toolsmith', name: 'Werkzeugschmiede', input: { iron: 2, planks: 1 }, output: { tools: 1 }, baseCost: { coins: 500, planks: 50, iron: 30 }, cost: { coins: 500, planks: 50, iron: 30 }, baseSpeed: 0.1, amount: 0, unlocked: false },
+                { id: 'jeweler', name: 'Schmuckwerkstatt', input: { copper: 2, iron: 1 }, output: { jewelry: 1 }, baseCost: { coins: 800, planks: 100, bricks: 50 }, cost: { coins: 800, planks: 100, bricks: 50 }, baseSpeed: 0.05, amount: 0, unlocked: false }
+            ],
+            
+            upgrades: [
+                // Clicking upgrades
+                { id: 'betterAxe', name: 'Bessere Axt', cost: { coins: 50 }, purchased: false, unlocked: true, effect: 'Verdoppelt die Holzmenge pro Klick', applyEffect: () => { gameState.clickValue.wood *= 2; } },
+                { id: 'stonePickaxe', name: 'Steinspitzhacke', cost: { coins: 150, wood: 50 }, purchased: false, unlocked: false, effect: 'Ermöglicht das Sammeln von Stein durch Klicken', applyEffect: () => { gameState.clickValue.stone = 1; } },
+                { id: 'ironPickaxe', name: 'Eisenspitzhacke', cost: { coins: 400, wood: 100, stone: 80 }, purchased: false, unlocked: false, effect: 'Ermöglicht das Sammeln von Eisen durch Klicken', applyEffect: () => { gameState.clickValue.iron = 1; } },
+                { id: 'copperPickaxe', name: 'Kupferspitzhacke', cost: { coins: 600, wood: 150, stone: 120 }, purchased: false, unlocked: false, effect: 'Ermöglicht das Sammeln von Kupfer durch Klicken', applyEffect: () => { gameState.clickValue.copper = 1; } },
+                
+                // Generator upgrades
+                { id: 'efficientWoodcutters', name: 'Effiziente Holzfäller', cost: { coins: 200, wood: 100 }, purchased: false, unlocked: false, effect: 'Verdoppelt die Produktion von Holzfällern', applyEffect: () => { applyUpgradeToGenerator('woodcutter', 2); } },
+                { id: 'efficientMiners', name: 'Effiziente Steinmetze', cost: { coins: 500, stone: 150 }, purchased: false, unlocked: false, effect: 'Verdoppelt die Produktion von Steinmetzen', applyEffect: () => { applyUpgradeToGenerator('miner', 2); } },
+                
+                // Converter upgrades
+                { id: 'fastSawmill', name: 'Schnelle Sägewerke', cost: { coins: 300, planks: 50 }, purchased: false, unlocked: false, effect: 'Verdoppelt die Geschwindigkeit von Sägewerken', applyEffect: () => { applyUpgradeToConverter('sawmill', 2); } },
+                { id: 'fastBrickmaker', name: 'Schnelle Ziegelei', cost: { coins: 600, bricks: 50 }, purchased: false, unlocked: false, effect: 'Verdoppelt die Geschwindigkeit von Ziegeleien', applyEffect: () => { applyUpgradeToConverter('brickmaker', 2); } }
+            ],
+            
+            achievements: [
+                // Resource milestones
+                { id: 'woodAch1', name: 'Holzsammler', requirement: () => gameState.resources.wood >= 100, achieved: false, description: '100 Holz gesammelt' },
+                { id: 'stoneAch1', name: 'Steinbruch', requirement: () => gameState.resources.stone >= 100, achieved: false, description: '100 Stein gesammelt' },
+                { id: 'ironAch1', name: 'Eisenzeit', requirement: () => gameState.resources.iron >= 50, achieved: false, description: '50 Eisen gesammelt' },
+                { id: 'planksAch1', name: 'Zimmermann', requirement: () => gameState.resources.planks >= 50, achieved: false, description: '50 Bretter hergestellt' },
+                { id: 'toolsAch1', name: 'Werkzeugmacher', requirement: () => gameState.resources.tools >= 20, achieved: false, description: '20 Werkzeuge hergestellt' },
+                { id: 'jewelryAch1', name: 'Juwelier', requirement: () => gameState.resources.jewelry >= 10, achieved: false, description: '10 Schmuckstücke hergestellt' },
+                
+                // Click milestones
+                { id: 'clickAch1', name: 'Fleißiger Klicker', requirement: () => gameState.totalClicks >= 100, achieved: false, description: '100 mal geklickt' },
+                { id: 'clickAch2', name: 'Klick-Enthusiast', requirement: () => gameState.totalClicks >= 500, achieved: false, description: '500 mal geklickt' },
+                
+                // Building milestones
+                { id: 'buildingAch1', name: 'Baumeister', requirement: () => getTotalBuildings() >= 10, achieved: false, description: 'Insgesamt 10 Gebäude gebaut' },
+                { id: 'converterAch1', name: 'Fabrikant', requirement: () => getTotalConverters() >= 5, achieved: false, description: 'Insgesamt 5 Konverter gebaut' }
+            ]
+        };
+        
+        // DOM elements
+        const clickButton = document.getElementById('click-btn');
+        const totalClicksDisplay = document.getElementById('total-clicks');
+        const playTimeDisplay = document.getElementById('play-time');
+        const progressBar = document.getElementById('progress-bar');
+        const resourceGeneratorsContainer = document.getElementById('resource-generators-container');
+        const convertersContainer = document.getElementById('converters-container');
+        const upgradesContainer = document.getElementById('upgrades-container');
+        const achievementsContainer = document.getElementById('achievements-container');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const prestigePointsDisplay = document.getElementById('prestige-points');
+        const prestigeButton = document.getElementById('prestige-btn');
+        const prestigeMultiplierDisplay = document.getElementById('prestige-multiplier');
+        const prestigeResetsDisplay = document.getElementById('prestige-resets');
+        
+        // Initialize resource displays
+        const resourceDisplays = {};
+        const productionDisplays = {};
+        
+        Object.keys(gameState.resources).forEach(resource => {
+            resourceDisplays[resource] = document.getElementById(resource);
+            productionDisplays[resource] = document.getElementById(`${resource}-per-second`);
+        });
+        
+        // Initialize game
+        function init() {
+            loadGame();
+            renderGenerators();
+            renderConverters();
+            renderUpgrades();
+            renderAchievements();
+            updateDisplay();
+            
+            // Main game loop
+            setInterval(gameLoop, 1000);
+            
+            // Auto-save every 30 seconds
+            setInterval(saveGame, 30000);
+            
+            // Check for achievements every 5 seconds
+            setInterval(checkAchievements, 5000);
+            
+            // Update display every 100ms for smoother progress
+            setInterval(updateProgressBar, 100);
+        }
+        
+        // Game loop (runs every second)
+        function gameLoop() {
+            // Process resource production from generators
+            Object.keys(gameState.production).forEach(resource => {
+                gameState.resources[resource] += gameState.production[resource];
+            });
+            
+            // Process converters
+            processConverters();
+            
+            // Update display
+            updateDisplay();
+            
+            // Update game time
+            updateGameTime();
+            
+            // Check for unlocks
+            checkUnlocks();
+            
+            // Update prestige info
+            updatePrestigeInfo();
+        }
+        
+        // Process resources conversion
+        function processConverters() {
+            gameState.converters.forEach(converter => {
+                if (converter.amount > 0) {
+                    const operationsPerSecond = converter.baseSpeed * converter.amount * gameState.prestigeMultiplier;
+                    
+                    // Check if we have enough resources for at least one conversion
+                    let canConvert = true;
+                    let maxOperations = operationsPerSecond;
+                    
+                    Object.keys(converter.input).forEach(resource => {
+                        const requiredAmount = converter.input[resource] * operationsPerSecond;
+                        if (gameState.resources[resource] < requiredAmount) {
+                            const possibleOperations = gameState.resources[resource] / converter.input[resource];
+                            maxOperations = Math.min(maxOperations, possibleOperations);
+                            canConvert = maxOperations > 0;
+                        }
+                    });
+                    
+                    if (canConvert) {
+                        // Consume input resources
+                        Object.keys(converter.input).forEach(resource => {
+                            gameState.resources[resource] -= converter.input[resource] * maxOperations;
+                        });
+                        
+                        // Produce output resources
+                        Object.keys(converter.output).forEach(resource => {
+                            gameState.resources[resource] += converter.output[resource] * maxOperations;
+                        });
+                    }
+                }
+            });
+        }
+        
+        // Click handler
+        clickButton.addEventListener('click', () => {
+            Object.keys(gameState.clickValue).forEach(resource => {
+                if (gameState.clickValue[resource] > 0) {
+                    gameState.resources[resource] += gameState.clickValue[resource] * gameState.prestigeMultiplier;
+                }
+            });
+            
+            gameState.totalClicks++;
+            
+            // Visual feedback
+            clickButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                clickButton.style.transform = 'scale(1)';
+            }, 100);
+            
+            updateDisplay();
+        });
+        
+        // Generate generators HTML
+        function renderGenerators() {
+            resourceGeneratorsContainer.innerHTML = '';
+            
+            gameState.generators.forEach(generator => {
+                if (generator.unlocked) {
+                    const output = (generator.baseOutput * generator.amount * gameState.prestigeMultiplier).toFixed(1);
+                    
+                    const generatorElement = document.createElement('div');
+                    generatorElement.className = 'generator';
+                    
+                    // Create cost display HTML
+                    let costHTML = '';
+                    Object.keys(generator.cost).forEach(resource => {
+                        const resourceIcon = `<span class="resource-icon ${resource}-icon"></span>`;
+                        costHTML += `<span class="cost-item">${resourceIcon}${formatNumber(generator.cost[resource])} ${capitalizeFirstLetter(resource)}</span>`;
+                    });
+                    
+                    generatorElement.innerHTML = `
+                        <div>
+                            <h3>${generator.name}</h3>
+                            <p>Produziert ${generator.baseOutput} ${capitalizeFirstLetter(generator.resource)} pro Sekunde</p>
+                            <div class="stats">Anzahl: ${generator.amount} | Ausbeute: ${output}/s</div>
+                        </div>
+                        <button class="buy-generator" data-id="${generator.id}">
+                            Kaufen<br>
+                            <span class="cost-display">${costHTML}</span>
+                        </button>
+                    `;
+                    resourceGeneratorsContainer.appendChild(generatorElement);
+                    
+                    // Add event listener
+                    generatorElement.querySelector('.buy-generator').addEventListener('click', () => {
+                        buyGenerator(generator.id);
+                    });
+                }
+            });
+            
+            // If no generators are unlocked
+            if (resourceGeneratorsContainer.children.length === 0) {
+                resourceGeneratorsContainer.innerHTML = '<p>Momentan sind keine Ressourcen-Sammler verfügbar.</p>';
+            }
+        }
+        
+        // Generate converters HTML
+        function renderConverters() {
+            convertersContainer.innerHTML = '';
+            
+            gameState.converters.forEach(converter => {
+                if (converter.unlocked) {
+                    const operationsPerSecond = (converter.baseSpeed * converter.amount * gameState.prestigeMultiplier).toFixed(2);
+                    
+                    const converterElement = document.createElement('div');
+                    converterElement.className = 'converter';
+                    
+                    // Create input resources HTML
+                    let inputHTML = '';
+                    Object.keys(converter.input).forEach(resource => {
+                        const resourceIcon = `<span class="resource-icon ${resource}-icon"></span>`;
+                        inputHTML += `<span class="cost-item">${resourceIcon}${converter.input[resource]} ${capitalizeFirstLetter(resource)}</span>`;
+                    });
+                    
+                    // Create output resources HTML
+                    let outputHTML = '';
+                    Object.keys(converter.output).forEach(resource => {
+                        const resourceIcon = `<span class="resource-icon ${resource}-icon"></span>`;
+                        outputHTML += `<span class="cost-item">${resourceIcon}${converter.output[resource]} ${capitalizeFirstLetter(resource)}</span>`;
+                    });
+                    
+                    // Create cost display HTML
+                    let costHTML = '';
+                    Object.keys(converter.cost).forEach(resource => {
+                        const resourceIcon = `<span class="resource-icon ${resource}-icon"></span>`;
+                        costHTML += `<span class="cost-item">${resourceIcon}${formatNumber(converter.cost[resource])} ${capitalizeFirstLetter(resource)}</span>`;
+                    });
+                    
+                    converterElement.innerHTML = `
+                        <div>
+                            <h3>${converter.name}</h3>
+                            <p>Konvertiert ${inputHTML} in ${outputHTML}</p>
+                            <div class="stats">Anzahl: ${converter.amount} | Geschwindigkeit: ${operationsPerSecond}/s</div>
+                        </div>
+                        <button class="buy-converter" data-id="${converter.id}">
+                            Kaufen<br>
+                            <span class="cost-display">${costHTML}</span>
+                        </button>
+                    `;
+                    convertersContainer.appendChild(converterElement);
+                    
+                    // Add event listener
+                    converterElement.querySelector('.buy-converter').addEventListener('click', () => {
+                        buyConverter(converter.id);
+                    });
+                }
+            });
+            
+            // If no converters are unlocked
+            if (convertersContainer.children.length === 0) {
+                convertersContainer.innerHTML = '<p>Momentan sind keine Konverter verfügbar.</p>';
+            }
+        }
+        
+        // Generate upgrades HTML
+        function renderUpgrades() {
+            upgradesContainer.innerHTML = '';
+            
+            gameState.upgrades.forEach(upgrade => {
+                if (upgrade.unlocked && !upgrade.purchased) {
+                    const upgradeElement = document.createElement('div');
+                    upgradeElement.className = 'upgrade';
+                    
+                    // Create cost display HTML
+                    let costHTML = '';
+                    Object.keys(upgrade.cost).forEach(resource => {
+                        const resourceIcon = `<span class="resource-icon ${resource}-icon"></span>`;
+                        costHTML += `<span class="cost-item">${resourceIcon}${formatNumber(upgrade.cost[resource])} ${capitalizeFirstLetter(resource)}</span>`;
+                    });
+                    
+                    upgradeElement.innerHTML = `
+                        <div>
+                            <h3>${upgrade.name}</h3>
+                            <p>${upgrade.effect}</p>
+                        </div>
+                        <button class="buy-upgrade" data-id="${upgrade.id}">
+                            Kaufen<br>
+                            <span class="cost-display">${costHTML}</span>
+                        </button>
+                    `;
+                    upgradesContainer.appendChild(upgradeElement);
+                    
+                    // Add event listener
+                    upgradeElement.querySelector('.buy-upgrade').addEventListener('click', () => {
+                        buyUpgrade(upgrade.id);
+                    });
+                }
+            });
+            
+            // If all upgrades are purchased or none are unlocked
+            if (upgradesContainer.children.length === 0) {
+                upgradesContainer.innerHTML = '<p>Momentan sind keine Verbesserungen verfügbar.</p>';
+            }
+        }
+        
+        // Generate achievements HTML
+        function renderAchievements() {
+            achievementsContainer.innerHTML = '';
+            
+            gameState.achievements.forEach(achievement => {
+                if (achievement.achieved) {
+                    const achievementElement = document.createElement('div');
+                    achievementElement.className = 'achievement';
+                    achievementElement.textContent = `${achievement.name}: ${achievement.description}`;
+                    achievementsContainer.appendChild(achievementElement);
+                }
+            });
+            
+            // If no achievements
+            if (achievementsContainer.children.length === 0) {
+                achievementsContainer.innerHTML = '<p>Noch keine Errungenschaften freigeschaltet.</p>';
+            }
+        }
+        
+        // Buy a generator
+        function buyGenerator(generatorId) {
+            const generator = gameState.generators.find(g => g.id === generatorId);
+            
+            // Check if player has enough resources
+            let canAfford = true;
+            Object.keys(generator.cost).forEach(resource => {
+                if (gameState.resources[resource] < generator.cost[resource]) {
+                    canAfford = false;
+                }
+            });
+            
+            if (canAfford) {
+                // Deduct costs
+                Object.keys(generator.cost).forEach(resource => {
+                    gameState.resources[resource] -= generator.cost[resource];
+                });
+                
+                generator.amount++;
+                
+                // Update cost for next purchase (15% increase)
+                Object.keys(generator.cost).forEach(resource => {
+                    generator.cost[resource] = Math.floor(generator.baseCost[resource] * Math.pow(1.15, generator.amount));
+                });
+                
+                // Update production
+                calculateProduction();
+                renderGenerators();
+                updateDisplay();
+            }
+        }
+        
+        // Buy a converter
+        function buyConverter(converterId) {
+            const converter = gameState.converters.find(c => c.id === converterId);
+            
+            // Check if player has enough resources
+            let canAfford = true;
+            Object.keys(converter.cost).forEach(resource => {
+                if (gameState.resources[resource] < converter.cost[resource]) {
+                    canAfford = false;
+                }
+            });
+            
+            if (canAfford) {
+                // Deduct costs
+                Object.keys(converter.cost).forEach(resource => {
+                    gameState.resources[resource] -= converter.cost[resource];
+                });
+                
+                converter.amount++;
+                
+                // Update cost for next purchase (20% increase)
+                Object.keys(converter.cost).forEach(resource => {
+                    converter.cost[resource] = Math.floor(converter.baseCost[resource] * Math.pow(1.2, converter.amount));
+                });
+                
+                renderConverters();
+                updateDisplay();
+            }
+        }
+        
+        // Buy an upgrade
+        function buyUpgrade(upgradeId) {
+            const upgrade = gameState.upgrades.find(u => u.id === upgradeId);
+            
+            // Check if player has enough resources
+            let canAfford = true;
+            Object.keys(upgrade.cost).forEach(resource => {
+                if (gameState.resources[resource] < upgrade.cost[resource]) {
+                    canAfford = false;
+                }
+            });
+            
+            if (canAfford && !upgrade.purchased) {
+                // Deduct costs
+                Object.keys(upgrade.cost).forEach(resource => {
+                    gameState.resources[resource] -= upgrade.cost[resource];
+                });
+                
+                upgrade.purchased = true;
+                
+                // Apply the upgrade effect
+                upgrade.applyEffect();
+                
+                // Update display
+                calculateProduction();
+                renderUpgrades();
+                renderGenerators();
+                renderConverters();
+                updateDisplay();
+            }
+        }
+        
+        // Apply upgrades to generators
+        function applyUpgradeToGenerator(generatorId, multiplier) {
+            const generator = gameState.generators.find(g => g.id === generatorId);
+            generator.baseOutput *= multiplier;
+            calculateProduction();
+        }
+        
+        // Apply upgrades to converters
+        function applyUpgradeToConverter(converterId, multiplier) {
+            const converter = gameState.converters.find(c => c.id === converterId);
+            converter.baseSpeed *= multiplier;
+        }
+        
+        // Calculate resource production
+        function calculateProduction() {
+            // Reset production
+            Object.keys(gameState.production).forEach(resource => {
+                gameState.production[resource] = 0;
+            });
+            
+            // Add production from generators
+            gameState.generators.forEach(generator => {
+                gameState.production[generator.resource] += generator.baseOutput * generator.amount;
+            });
+            
+            // Apply prestige multiplier
+            Object.keys(gameState.production).forEach(resource => {
+                gameState.production[resource] *= gameState.prestigeMultiplier;
+            });
+        }
+        
+        // Update the display
+        function updateDisplay() {
+            // Update resource displays
+            Object.keys(gameState.resources).forEach(resource => {
+                if (resourceDisplays[resource]) {
+                    resourceDisplays[resource].textContent = formatNumber(Math.floor(gameState.resources[resource]));
+                }
+                if (productionDisplays[resource]) {
+                    productionDisplays[resource].textContent = formatNumber(gameState.production[resource].toFixed(1));
+                }
+            });
+            
+            totalClicksDisplay.textContent = formatNumber(gameState.totalClicks);
+            
+            // Update buttons based on affordability
+            updateButtonStates();
+            
+            // Show/hide resource displays based on unlocked status
+            Object.keys(gameState.unlockedResources).forEach(resource => {
+                const resourceElement = document.getElementById(resource)?.parentElement?.parentElement;
+                if (resourceElement) {
+                    if (gameState.unlockedResources[resource]) {
+                        resourceElement.style.display = 'block';
+                    } else {
+                        resourceElement.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // Format large numbers
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString('de-DE');
+        }
+        
+        // Capitalize first letter
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        // Update game time display
+        function updateGameTime() {
+            const currentTime = Date.now();
+            const elapsedSeconds = Math.floor((currentTime - gameState.startTime) / 1000);
+            const minutes = Math.floor(elapsedSeconds / 60);
+            const seconds = elapsedSeconds % 60;
+            
+            playTimeDisplay.textContent = `${minutes}m ${seconds}s`;
+        }
+        
+        // Update the progress bar
+        function updateProgressBar() {
+            // Determine the next goal
+            let nextGoal = Infinity;
+            let currentResource = '';
+            
+            // Check for next generator goal
+            gameState.generators.forEach(generator => {
+                if (generator.unlocked) {
+                    Object.keys(generator.cost).forEach(resource => {
+                        if (gameState.resources[resource] < generator.cost[resource] && generator.cost[resource] < nextGoal) {
+                            nextGoal = generator.cost[resource];
+                            currentResource = resource;
+                        }
+                    });
+                }
+            });
+            
+            // Check for converter goals
+            gameState.converters.forEach(converter => {
+                if (converter.unlocked) {
+                    Object.keys(converter.cost).forEach(resource => {
+                        if (gameState.resources[resource] < converter.cost[resource] && converter.cost[resource] < nextGoal) {
+                            nextGoal = converter.cost[resource];
+                            currentResource = resource;
+                        }
+                    });
+                }
+            });
+            
+            // Check for upgrade goals
+            gameState.upgrades.forEach(upgrade => {
+                if (upgrade.unlocked && !upgrade.purchased) {
+                    Object.keys(upgrade.cost).forEach(resource => {
+                        if (gameState.resources[resource] < upgrade.cost[resource] && upgrade.cost[resource] < nextGoal) {
+                            nextGoal = upgrade.cost[resource];
+                            currentResource = resource;
+                        }
+                    });
+                }
+            });
+            
+            // If no goal found, use coins for prestige
+            if (nextGoal === Infinity || !currentResource) {
+                nextGoal = 1000000;
+                currentResource = 'coins';
+            }
+            
+            // Calculate progress percentage
+            let progressPercent = Math.min(100, (gameState.resources[currentResource] / nextGoal) * 100);
+            progressBar.style.width = `${progressPercent}%`;
+        }
+        
+        // Check for unlocks based on resources
+        function checkUnlocks() {
+            // Unlock resources
+            if (gameState.resources.wood >= 20 && !gameState.unlockedResources.stone) {
+                gameState.unlockedResources.stone = true;
+                gameState.generators.find(g => g.id === 'miner').unlocked = true;
+                updateDisplay();
+                renderGenerators();
+            }
+            
+            if (gameState.resources.stone >= 30 && !gameState.unlockedResources.iron) {
+                gameState.unlockedResources.iron = true;
+                gameState.generators.find(g => g.id === 'ironMiner').unlocked = true;
+                updateDisplay();
+                renderGenerators();
+            }
+            
+            if (gameState.resources.iron >= 20 && !gameState.unlockedResources.copper) {
+                gameState.unlockedResources.copper = true;
+                gameState.generators.find(g => g.id === 'copperMiner').unlocked = true;
+                updateDisplay();
+                renderGenerators();
+            }
+            
+            // Unlock secondary resources
+            if (gameState.resources.wood >= 40 && !gameState.unlockedResources.planks) {
+                gameState.unlockedResources.planks = true;
+                gameState.converters.find(c => c.id === 'sawmill').unlocked = true;
+                updateDisplay();
+                renderConverters();
+            }
+            
+            if (gameState.resources.stone >= 60 && !gameState.unlockedResources.bricks) {
+                gameState.unlockedResources.bricks = true;
+                gameState.converters.find(c => c.id === 'brickmaker').unlocked = true;
+                updateDisplay();
+                renderConverters();
+            }
+            
+            // Unlock tertiary resources
+            if (gameState.resources.iron >= 40 && gameState.resources.planks >= 20 && !gameState.unlockedResources.tools) {
+                gameState.unlockedResources.tools = true;
+                gameState.converters.find(c => c.id === 'toolsmith').unlocked = true;
+                updateDisplay();
+                renderConverters();
+            }
+            
+            if (gameState.resources.copper >= 30 && gameState.resources.iron >= 20 && !gameState.unlockedResources.jewelry) {
+                gameState.unlockedResources.jewelry = true;
+                gameState.converters.find(c => c.id === 'jeweler').unlocked = true;
+                updateDisplay();
+                renderConverters();
+            }
+            
+            // Unlock market (coin generator)
+            if (gameState.resources.wood >= 25 && !gameState.generators.find(g => g.id === 'market').unlocked) {
+                gameState.generators.find(g => g.id === 'market').unlocked = true;
+                renderGenerators();
+            }
+            
+            // Unlock bank (advanced coin generator)
+            if (gameState.resources.wood >= 80 && gameState.resources.stone >= 40 && !gameState.generators.find(g => g.id === 'bank').unlocked) {
+                gameState.generators.find(g => g.id === 'bank').unlocked = true;
+                renderGenerators();
+            }
+            
+            // Unlock upgrades
+            if (gameState.resources.wood >= 40 && !gameState.upgrades.find(u => u.id === 'efficientWoodcutters').unlocked) {
+                gameState.upgrades.find(u => u.id === 'efficientWoodcutters').unlocked = true;
+                renderUpgrades();
+            }
+            
+            if (gameState.resources.stone >= 50 && !gameState.upgrades.find(u => u.id === 'stonePickaxe').unlocked) {
+                gameState.upgrades.find(u => u.id === 'stonePickaxe').unlocked = true;
+                renderUpgrades();
+            }
+            
+            if (gameState.resources.iron >= 30 && !gameState.upgrades.find(u => u.id === 'ironPickaxe').unlocked) {
+                gameState.upgrades.find(u => u.id === 'ironPickaxe').unlocked = true;
+                renderUpgrades();
+            }
+            
+            if (gameState.resources.copper >= 20 && !gameState.upgrades.find(u => u.id === 'copperPickaxe').unlocked) {
+                gameState.upgrades.find(u => u.id === 'copperPickaxe').unlocked = true;
+                renderUpgrades();
+            }
+            
+            if (gameState.resources.stone >= 100 && !gameState.upgrades.find(u => u.id === 'efficientMiners').unlocked) {
+                gameState.upgrades.find(u => u.id === 'efficientMiners').unlocked = true;
+                renderUpgrades();
+            }
+            
+            if (gameState.resources.planks >= 30 && !gameState.upgrades.find(u => u.id === 'fastSawmill').unlocked) {
+                gameState.upgrades.find(u => u.id === 'fastSawmill').unlocked = true;
+                renderUpgrades();
+            }
+            
+            if (gameState.resources.bricks >= 30 && !gameState.upgrades.find(u => u.id === 'fastBrickmaker').unlocked) {
+                gameState.upgrades.find(u => u.id === 'fastBrickmaker').unlocked = true;
+                renderUpgrades();
+            }
+        }
+        
+        // Check for achievements
+        function checkAchievements() {
+            let newAchievements = false;
+            
+            gameState.achievements.forEach(achievement => {
+                if (!achievement.achieved && achievement.requirement()) {
+                    achievement.achieved = true;
+                    newAchievements = true;
+                }
+            });
+            
+            if (newAchievements) {
+                renderAchievements();
+            }
+        }
+        
+        // Get total buildings (generators + converters)
+        function getTotalBuildings() {
+            return gameState.generators.reduce((total, generator) => total + generator.amount, 0) +
+                   gameState.converters.reduce((total, converter) => total + converter.amount, 0);
+        }
+        
+        // Get total converters
+        function getTotalConverters() {
+            return gameState.converters.reduce((total, converter) => total + converter.amount, 0);
+        }
+        
+        // Update button states based on affordability
+        function updateButtonStates() {
+            // Generator buttons
+            document.querySelectorAll('.buy-generator').forEach(button => {
+                const generatorId = button.getAttribute('data-id');
+                const generator = gameState.generators.find(g => g.id === generatorId);
+                
+                let canAfford = true;
+                Object.keys(generator.cost).forEach(resource => {
+                    if (gameState.resources[resource] < generator.cost[resource]) {
+                        canAfford = false;
+                    }
+                });
+                
+                button.disabled = !canAfford;
+            });
+            
+            // Converter buttons
+            document.querySelectorAll('.buy-converter').forEach(button => {
+                const converterId = button.getAttribute('data-id');
+                const converter = gameState.converters.find(c => c.id === converterId);
+                
+                let canAfford = true;
+                Object.keys(converter.cost).forEach(resource => {
+                    if (gameState.resources[resource] < converter.cost[resource]) {
+                        canAfford = false;
+                    }
+                });
+                
+                button.disabled = !canAfford;
+            });
+            
+            // Upgrade buttons
+            document.querySelectorAll('.buy-upgrade').forEach(button => {
+                const upgradeId = button.getAttribute('data-id');
+                const upgrade = gameState.upgrades.find(u => u.id === upgradeId);
+                
+                let canAfford = true;
+                Object.keys(upgrade.cost).forEach(resource => {
+                    if (gameState.resources[resource] < upgrade.cost[resource]) {
+                        canAfford = false;
+                    }
+                });
+                
+                button.disabled = !canAfford;
+            });
+            
+            // Prestige button
+            prestigeButton.disabled = gameState.resources.coins < 1000000;
+        }
+        
+        // Update prestige information
+        function updatePrestigeInfo() {
+            const potentialPoints = Math.floor(Math.sqrt(gameState.resources.coins / 10000));
+            prestigePointsDisplay.textContent = potentialPoints;
+            
+            prestigeMultiplierDisplay.textContent = gameState.prestigeMultiplier.toFixed(1);
+            prestigeResetsDisplay.textContent = gameState.prestigeResets;
+        }
+        
+        // Perform prestige reset
+        function performPrestige() {
+            if (gameState.resources.coins >= 1000000) {
+                const prestigePoints = Math.floor(Math.sqrt(gameState.resources.coins / 10000));
+                
+                // Reset game but keep prestige stats
+                gameState.prestigePoints += prestigePoints;
+                gameState.prestigeMultiplier = 1 + (gameState.prestigePoints * 0.1);
+                gameState.prestigeResets++;
+                
+                // Reset resources
+                Object.keys(gameState.resources).forEach(resource => {
+                    gameState.resources[resource] = 0;
+                });
+                
+                // Reset production
+                Object.keys(gameState.production).forEach(resource => {
+                    gameState.production[resource] = 0;
+                });
+                
+                // Reset click values but maintain base resources
+                gameState.clickValue = {
+                    coins: 1,
+                    wood: 1,
+                    stone: 0,
+                    iron: 0,
+                    copper: 0
+                };
+                
+                gameState.totalClicks = 0;
+                
+                // Reset unlocked resources
+                Object.keys(gameState.unlockedResources).forEach(resource => {
+                    gameState.unlockedResources[resource] = false;
+                });
+                gameState.unlockedResources.coins = true;
+                gameState.unlockedResources.wood = true;
+                
+                // Reset generators
+                gameState.generators.forEach(generator => {
+                    generator.amount = 0;
+                    Object.keys(generator.cost).forEach(resource => {
+                        generator.cost[resource] = generator.baseCost[resource];
+                    });
+                    generator.unlocked = false;
+                });
+                // Always unlock the basic generators
+                gameState.generators.find(g => g.id === 'woodcutter').unlocked = true;
+                
+                // Reset converters
+                gameState.converters.forEach(converter => {
+                    converter.amount = 0;
+                    Object.keys(converter.cost).forEach(resource => {
+                        converter.cost[resource] = converter.baseCost[resource];
+                    });
+                    converter.unlocked = false;
+                });
+                
+                // Reset upgrades
+                gameState.upgrades.forEach(upgrade => {
+                    upgrade.purchased = false;
+                    upgrade.unlocked = false;
+                });
+                // Always unlock the first upgrade
+                gameState.upgrades.find(u => u.id === 'betterAxe').unlocked = true;
+                
+                // Update display
+                calculateProduction();
+                renderGenerators();
+                renderConverters();
+                renderUpgrades();
+                updateDisplay();
+                updatePrestigeInfo();
+            }
+        }
+        
+        // Save game to localStorage
+        function saveGame() {
+            localStorage.setItem('resourceImperiumSave', JSON.stringify(gameState));
+            gameState.lastSaveTime = Date.now();
+        }
+        
+        // Load game from localStorage
+        function loadGame() {
+            const savedGame = localStorage.getItem('resourceImperiumSave');
+            
+            if (savedGame) {
+                const loadedState = JSON.parse(savedGame);
+                
+                // Merge loaded state with current state (to handle new properties in updates)
+                Object.assign(gameState, loadedState);
+                
+                // Calculate offline progress
+                const currentTime = Date.now();
+                const offlineSeconds = Math.floor((currentTime - gameState.lastSaveTime) / 1000);
+                
+                if (offlineSeconds > 0) {
+                    // Add basic resources from generators
+                    Object.keys(gameState.production).forEach(resource => {
+                        if (gameState.production[resource] > 0) {
+                            gameState.resources[resource] += gameState.production[resource] * offlineSeconds;
+                        }
+                    });
+                    
+                    // Show offline progress message
+                    let offlineMessage = `Willkommen zurück! Du hast während deiner Abwesenheit (${Math.floor(offlineSeconds / 60)} Minuten, ${offlineSeconds % 60} Sekunden) folgende Ressourcen gesammelt:`;
+                    let resourcesGained = false;
+                    
+                    Object.keys(gameState.production).forEach(resource => {
+                        if (gameState.production[resource] > 0) {
+                            const amount = gameState.production[resource] * offlineSeconds;
+                            offlineMessage += `\n- ${formatNumber(amount.toFixed(0))} ${capitalizeFirstLetter(resource)}`;
+                            resourcesGained = true;
+                        }
+                    });
+                    
+                    if (resourcesGained) {
+                        alert(offlineMessage);
+                    }
+                }
+                
+                // Recalculate production (in case of game updates)
+                calculateProduction();
+            }
+        }
+        
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to current tab
+                tab.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+        
+        // Prestige button
+        prestigeButton.addEventListener('click', performPrestige);
+        
+        // Initialize game
+        init();
+    </script>
+</body>
+</html>

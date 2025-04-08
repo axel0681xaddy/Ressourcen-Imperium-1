@@ -1,0 +1,38 @@
+# Ressourcen-Imperium IDLE-Game
+
+## Projektstruktur
+
+```
+ressourcen-imperium/
+│
+├── index.html               # Hauptseite mit minimaler HTML-Struktur
+├── css/
+│   └── styles.css           # Alle Styles für das Spiel
+│
+├── js/
+│   ├── main.js              # Hauptdatei mit Spielinitialisierung
+│   ├── gameState.js         # Definition des Spielzustands und Ressourcen
+│   ├── generators.js        # Ressourcen-Generatoren (Holzfäller, Minen, etc.)
+│   ├── converters.js        # Konverter-Logik (Sägewerk, Werkzeugschmiede, etc.)
+│   ├── upgrades.js          # Verbesserungen und deren Effekte
+│   ├── achievements.js      # Errungenschaften und deren Bedingungen
+│   ├── prestige.js          # Prestige-System
+│   ├── gameLoop.js          # Hauptspiel-Loop für Resourcenberechnung
+│   ├── display.js           # UI-Aktualisierungsfunktionen
+│   ├── events.js            # Event-Handler für Klicks und Buttons
+│   └── storage.js           # Speicher-/Ladefunktionen und Offline-Progression
+│
+└── assets/                  # Optional für zukünftige Icons/Grafiken
+    └── icons/
+        └── resource-icons.svg
+```
+
+## Installation und Start
+
+1. Erstellen Sie die Ordnerstruktur wie oben angegeben
+2. Kopieren Sie jede Datei in den entsprechenden Ordner
+3. Öffnen Sie `index.html` in einem Webbrowser, um das Spiel zu starten
+
+## Abhängigkeiten und Import-System
+
+Das Projekt verwendet ES6-Module für die Importe zwischen den JavaScript-Dateien. Diese Technik ermöglicht eine saubere Trennung der Funktionalitäten ohne die Notwendigkeit zusätzlicher Bibliotheken.

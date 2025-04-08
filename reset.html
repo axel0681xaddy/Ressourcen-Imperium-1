@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiel zurücksetzen</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 100px auto;
+            text-align: center;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 { color: #2c3e50; }
+        .buttons {
+            margin-top: 30px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+        }
+        .reset { background-color: #e74c3c; color: white; }
+        .cancel { background-color: #3498db; color: white; }
+        p { line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <h1>Spiel zurücksetzen</h1>
+    <p>Möchtest du dein Spiel wirklich zurücksetzen? Dies löscht deinen gesamten Fortschritt!</p>
+    <div class="buttons">
+        <button class="reset" onclick="resetGame()">Ja, Spiel zurücksetzen</button>
+        <button class="cancel" onclick="goBack()">Nein, zurück zum Spiel</button>
+    </div>
+
+    <script>
+        function resetGame() {
+            // Alle möglichen Spielstände löschen
+            localStorage.removeItem('resourceImperiumSave');
+            localStorage.removeItem('idleGameSave');
+            localStorage.clear(); // Zur Sicherheit alles löschen
+            
+            // Bestätigungsmeldung
+            alert('Spielstand erfolgreich zurückgesetzt. Du wirst zum Spiel weitergeleitet.');
+            
+            // Zurück zum Spiel mit Cache-Bypass-Parameter
+            window.location.href = 'index.html?nocache=' + new Date().getTime();
+        }
+        
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

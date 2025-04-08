@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ressourcen-Imperium - Admin-Bereich</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        
+        .admin-container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .admin-sidebar {
+            flex: 0 0 200px;
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .admin-content {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .admin-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .admin-nav li {
+            margin-bottom: 5px;
+        }
+        
+        .admin-nav a {
+            display: block;
+            padding: 8px 10px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .admin-nav a:hover, .admin-nav a.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .admin-section {
+            display: none;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .editor-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .editor-table th {
+            text-align: left;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .editor-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .editor-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .resource-cost {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .resource-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            border-radius: 4px;
+        }
+        
+        .coin-icon { background-color: #f1c40f; }
+        .wood-icon { background-color: #8b4513; }
+        .stone-icon { background-color: #7f8c8d; }
+        .iron-icon { background-color: #95a5a6; }
+        .copper-icon { background-color: #e67e22; }
+        .plank-icon { background-color: #d35400; }
+        .brick-icon { background-color: #c0392b; }
+        .tool-icon { background-color: #34495e; }
+        .jewelry-icon { background-color: #9b59b6; }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .save-button {
+            background-color: #2ecc71;
+        }
+        
+        .save-button:hover {
+            background-color: #27ae60;
+        }
+        
+        .reset-button {
+            background-color: #e74c3c;
+        }
+        
+        .reset-button:hover {
+            background-color: #c0392b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .back-to-game {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .back-to-game:hover {
+            background-color: #5a6268;
+        }
+
+        .parameter-group {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .parameter-group h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .resource-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .resource-input-group label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .resource-input-group input {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ressourcen-Imperium Admin-Bereich</h1>
+        <a href="index.html" class="back-to-game">← Zurück zum Spiel</a>
+    </header>
+    
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <ul class="admin-nav">
+                <li><a href="#" data-section="generators" class="active">Generatoren</a></li>
+                <li><a href="#" data-section="converters">Konverter</a></li>
+                <li><a href="#" data-section="balancing">Spielbalance</a></li>
+                <li><a href="#" data-section="prestige">Prestige-System</a></li>
+                <li><a href="#" data-section="debug">Debug-Tools</a></li>
+            </ul>
+        </div>
+        
+        <div class="admin-content">
+            <!-- Generator-Editor -->
+            <div class="admin-section active" id="generators-section">
+                <h2>Generator-Einstellungen</h2>
+                <p>Hier können Sie die Eigenschaften aller Ressourcen-Generatoren anpassen.</p>
+                
+                <table class="editor-table" id="generators-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Ressource</th>
+                            <th>Basis-Produktion</th>
+                            <th>Basis-Kosten</th>
+                            <th>Aktuelle Kosten</th>
+                            <th>Freigeschaltet</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Wird durch JavaScript gefüllt -->
+                    </tbody>
+                </table>
+                
+                <div class="action-buttons">
+                    <button type="button" class="reset-button" id="reset-generators">Zurücksetzen</button>
+                    <button type="button" class="save-button" id="save-generators">Änderungen speichern</button>
+                </div>
+            </div>
+            
+            <!-- Konverter-Editor -->
+            <div class="admin-section" id="converters-section">
+                <h2>Konverter-Einstellungen</h2>
+                <p>Hier können Sie die Eigenschaften aller Ressourcen-Konverter anpassen.</p>
+                
+                <table class="editor-table" id="converters-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Eingang</th>
+                            <th>Ausgang</th>
+                            <th>Geschwindigkeit</th>
+                            <th>Basis-Kosten</th>
+                            <th>Freigeschaltet</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Wird durch JavaScript gefüllt -->
+                    </tbody>
+                </table>
+                
+                <div class="action-buttons">
+                    <button type="button" class="reset-button" id="reset-converters">Zurücksetzen</button>
+                    <button type="button" class="save-button" id="save-converters">Änderungen speichern</button>
+                </div>
+            </div>
+            
+            <!-- Spielbalance-Editor -->
+            <div class="admin-section" id="balancing-section">
+                <h2>Spielbalance-Einstellungen</h2>
+                <p>Hier können Sie grundlegende Spielparameter anpassen, um das Spiel zu balancieren.</p>
+                
+                <div class="parameter-group">
+                    <h3>Generatorparameter</h3>
+                    <div class="form-group">
+                        <label for="generator-cost-multiplier">Kosten-Multiplikator beim Kauf:</label>
+                        <input type="number" id="generator-cost-multiplier" min="1.01" max="2" step="0.01" value="1.15">
+                        <small>Standard: 1.15 (15% Erhöhung pro Kauf)</small>
+                    </div>
+                </div>
+                
+                <div class="parameter-group">
+                    <h3>Konverterparameter</h3>
+                    <div class="form-group">
+                        <label for="converter-cost-multiplier">Kosten-Multiplikator beim Kauf:</label>
+                        <input type="number" id="converter-cost-multiplier" min="1.01" max="2" step="0.01" value="1.20">
+                        <small>Standard: 1.20 (20% Erhöhung pro Kauf)</small>
+                    </div>
+                </div>
+                
+                <div class="parameter-group">
+                    <h3>Klick-Parameter</h3>
+                    <div class="form-group">
+                        <label for="click-cooldown">Klick-Cooldown (ms):</label>
+                        <input type="number" id="click-cooldown" min="100" max="2000" step="50" value="500">
+                        <small>Standard: 500ms</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Klick-Ressourcenwerte:</label>
+                        <div class="resource-input-group">
+                            <label><span class="resource-icon wood-icon"></span> Holz:</label>
+                            <input type="number" id="click-wood" min="0" max="10" step="0.1" value="1">
+                        </div>
+                        <div class="resource-input-group">
+                            <label><span class="resource-icon stone-icon"></span> Stein:</label>
+                            <input type="number" id="click-stone" min="0" max="10" step="0.1" value="0">
+                        </div>
+                        <div class="resource-input-group">
+                            <label><span class="resource-icon iron-icon"></span> Eisen:</label>
+                            <input type="number" id="click-iron" min="0" max="10" step="0.1" value="0">
+                        </div>
+                        <div class="resource-input-group">
+                            <label><span class="resource-icon copper-icon"></span> Kupfer:</label>
+                            <input type="number" id="click-copper" min="0" max="10" step="0.1" value="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="button" class="reset-button" id="reset-balancing">Zurücksetzen</button>
+                    <button type="button" class="save-button" id="save-balancing">Änderungen speichern</button>
+                </div>
+            </div>
+            
+            <!-- Prestige-System-Editor -->
+            <div class="admin-section" id="prestige-section">
+                <h2>Prestige-System-Einstellungen</h2>
+                <p>Hier können Sie die Parameter des Prestige-Systems anpassen.</p>
+                
+                <div class="form-group">
+                    <label for="prestige-requirement">Münzen benötigt für Prestige:</label>
+                    <input type="number" id="prestige-requirement" min="10000" step="10000" value="1000000">
+                    <small>Standard: 1.000.000 Münzen</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prestige-points-formula">Prestige-Punkte-Formel:</label>
+                    <select id="prestige-points-formula">
+                        <option value="sqrt">Wurzel (coins / 10000)</option>
+                        <option value="log10">Log10 (coins / 10000)</option>
+                        <option value="linear">Linear (coins / 100000)</option>
+                    </select>
+                    <small>Formel zur Berechnung der Prestige-Punkte</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="prestige-multiplier-value">Multiplikator pro Prestige-Punkt:</label>
+                    <input type="number" id="prestige-multiplier-value" min="0.01" max="1" step="0.01" value="0.1">
+                    <small>Standard: 0.1 (10% pro Punkt)</small>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="button" class="reset-button" id="reset-prestige">Zurücksetzen</button>
+                    <button type="button" class="save-button" id="save-prestige">Änderungen speichern</button>
+                </div>
+            </div>
+            
+            <!-- Debug-Tools -->
+            <div class="admin-section" id="debug-section">
+                <h2>Debug-Tools</h2>
+                <p>Hier finden Sie Werkzeuge zum Testen und Debuggen des Spiels.</p>
+                
+                <div class="parameter-group">
+                    <h3>Ressourcen hinzufügen</h3>
+                    <p>Geben Sie die Menge an Ressourcen ein, die Sie sofort zum Spiel hinzufügen möchten:</p>
+                    
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon coin-icon"></span> Münzen:</label>
+                        <input type="number" id="add-coins" min="0" value="1000">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon wood-icon"></span> Holz:</label>
+                        <input type="number" id="add-wood" min="0" value="100">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon stone-icon"></span> Stein:</label>
+                        <input type="number" id="add-stone" min="0" value="100">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon iron-icon"></span> Eisen:</label>
+                        <input type="number" id="add-iron" min="0" value="50">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon copper-icon"></span> Kupfer:</label>
+                        <input type="number" id="add-copper" min="0" value="50">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon plank-icon"></span> Bretter:</label>
+                        <input type="number" id="add-planks" min="0" value="50">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon brick-icon"></span> Ziegel:</label>
+                        <input type="number" id="add-bricks" min="0" value="50">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon tool-icon"></span> Werkzeuge:</label>
+                        <input type="number" id="add-tools" min="0" value="20">
+                    </div>
+                    <div class="resource-input-group">
+                        <label><span class="resource-icon jewelry-icon"></span> Schmuck:</label>
+                        <input type="number" id="add-jewelry" min="0" value="10">
+                    </div>
+                    
+                    <button type="button" id="add-resources-btn">Ressourcen hinzufügen</button>
+                </div>
+                
+                <div class="parameter-group">
+                    <h3>Schnelle Aktionen</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" id="unlock-all-btn">Alles freischalten</button>
+                        <button type="button" id="reset-game-btn" class="reset-button">Spiel zurücksetzen</button>
+                        <button type="button" id="test-progression-btn">Progression testen</button>
+                    </div>
+                </div>
+                
+                <div id="status-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
