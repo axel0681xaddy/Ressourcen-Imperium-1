@@ -1,0 +1,191 @@
+# Umgebungsvariablen
+.env
+.env.*
+!.env.example
+
+# Abhängigkeiten
+/node_modules
+/vendor
+package-lock.json
+composer.lock
+
+# Kompilierte Dateien
+/dist
+/build
+/public/assets/js/*.min.js
+/public/assets/css/*.min.css
+*.map
+
+# Cache und temporäre Dateien
+.cache
+.temp
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/app/public/*
+/bootstrap/cache/*
+*.cache
+*.log
+*.tmp
+
+# IDE und Editor Dateien
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Spielstände und Benutzerdaten
+/saves/*
+/user_data/*
+/backups/*
+*.save
+*.bak
+
+# Konfigurationsdateien
+config.local.js
+config.prod.js
+database.php
+
+# Test Coverage
+/coverage
+.phpunit.result.cache
+/tests/coverage/*
+
+# Entwickler-Tools
+/dev-tools/*
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Deployment-Dateien
+.deploy/*
+deploy.php
+*.deploy.php
+
+# Medien und Assets im Entwicklungsprozess
+/resources/assets/raw/*
+/resources/assets/temp/*
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xd
+
+# Dokumentation (optional)
+/docs/internal/*
+/docs/dev/*
+
+# Lokale SSL Zertifikate
+*.pem
+*.key
+*.crt
+*.csr
+*.srl
+
+# Datenbank
+*.sqlite
+*.sqlite3
+*.db
+
+# Komprimierte Dateien
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Lokale Konfigurationen
+.htaccess.local
+nginx.local.conf
+php.local.ini
+
+# Systemdateien
+.directory
+.nfs*
+.fuse_hidden*
+
+# Backup Dateien
+*copy*
+*backup*
+*old*
+*new*
+*orig*
+*working*
+
+# API Dokumentation
+/api-docs/*
+swagger.json
+swagger.yaml
+
+# Lokale Skripte
+*.local.sh
+*.local.bat
+*.local.ps1
+
+# Performance Profiling
+*.prof
+profiler/*
+
+# Sicherheitsdateien
+*.pem
+*.pub
+*.key
+*.crt
+*.csr
+*.srl
+*.p12
+*.pfx
+
+# Build Artefakte
+.grunt
+.gulp
+.webpack
+.next
+.nuxt
+.vuepress/dist
+
+# Lokale Entwicklungsumgebung
+.localdev/*
+docker-compose.override.yml
+Vagrantfile
+.vagrant/
+
+# Generierte Dateien
+*.generated.*
+generated/*
+auto-generated/*
+
+# Platform-spezifische Dateien
+.phpstorm.meta.php
+_ide_helper.php
+.php_cs.cache
+.php-cs-fixer.cache
+
+# Spezifische Projektdateien
+TODO.md
+NOTES.md
+CHANGELOG.local.md
+VERSION.local
+
+# Temporäre Uploads
+/uploads/temp/*
+/uploads/cache/*
+
+# Private Konfigurationen
+private.key
+private.pem
+secrets.json
+credentials.json
+
+# Lokale Testdaten
+/tests/data/*
+/tests/fixtures/*
+mock-data/*

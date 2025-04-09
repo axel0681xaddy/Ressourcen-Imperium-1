@@ -1,0 +1,138 @@
+{
+  "name": "ressourcen-imperium",
+  "version": "1.0.0",
+  "description": "Ein Browser-basiertes Ressourcen-Management-Spiel",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --ext .js --fix",
+    "format": "prettier --write \"src/**/*.{js,css,html}\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "analyze": "source-map-explorer dist/assets/*.js",
+    "serve": "serve dist",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean",
+    "postbuild": "npm run optimize",
+    "optimize": "npm run optimize:js && npm run optimize:css && npm run optimize:images",
+    "optimize:js": "terser dist/assets/js/*.js --compress --mangle --output dist/assets/js/",
+    "optimize:css": "postcss dist/assets/css/*.css --use cssnano --dir dist/assets/css/",
+    "optimize:images": "imagemin dist/assets/images/* --out-dir=dist/assets/images",
+    "generate-sw": "workbox generateSW workbox-config.js",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "core-js": "^3.35.0",
+    "date-fns": "^3.0.6",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.7",
+    "@types/jest": "^29.5.11",
+    "@vitejs/plugin-legacy": "^5.2.0",
+    "@vue/compiler-sfc": "^3.4.5",
+    "autoprefixer": "^10.4.16",
+    "babel-jest": "^29.7.0",
+    "cssnano": "^6.0.3",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jest": "^27.6.1",
+    "eslint-plugin-prettier": "^5.1.2",
+    "imagemin-cli": "^7.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.1.1",
+    "rimraf": "^5.0.5",
+    "serve": "^14.2.1",
+    "source-map-explorer": "^2.5.3",
+    "terser": "^5.26.0",
+    "vite": "^5.0.10",
+    "vite-plugin-pwa": "^0.17.4",
+    "workbox-cli": "^7.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/**/*.test.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "browser": true,
+      "es2022": true,
+      "node": true,
+      "jest": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "warn",
+      "no-debugger": "warn"
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "printWidth": 80
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {},
+      "cssnano": {
+        "preset": "default"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ressourcen-imperium.git"
+  },
+  "author": "Ressourcen-Imperium Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/ressourcen-imperium/issues"
+  },
+  "homepage": "https://lamp.deinfo-projects.de/Game2"
+}

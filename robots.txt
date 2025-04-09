@@ -1,0 +1,88 @@
+# robots.txt für Ressourcen-Imperium
+# https://www.ressourcen-imperium.de
+
+# Alle Crawler
+User-agent: *
+
+# Erlaubte Bereiche
+Allow: /
+Allow: /index.html
+Allow: /about.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /sitemap.xml
+Allow: /assets/icons/
+Allow: /assets/screenshots/
+Allow: /manifest.json
+
+# Geschützte Bereiche
+Disallow: /js/
+Disallow: /css/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /backend/
+Disallow: /saves/
+Disallow: /user/
+Disallow: /temp/
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*?*
+Disallow: /*/debug
+Disallow: /debug/
+Disallow: /test/
+Disallow: /dev/
+
+# Spezielle Regeln für Google
+User-agent: Googlebot
+Allow: /assets/screenshots/
+Allow: /sitemap.xml
+Disallow: /api/
+Crawl-delay: 1
+
+# Spezielle Regeln für Bing
+User-agent: Bingbot
+Allow: /assets/screenshots/
+Allow: /sitemap.xml
+Disallow: /api/
+Crawl-delay: 2
+
+# Spezielle Regeln für Social Media Crawler
+User-agent: Twitterbot
+Allow: /assets/screenshots/
+Allow: /assets/icons/
+Disallow: /
+
+User-agent: facebookexternalhit
+Allow: /assets/screenshots/
+Allow: /assets/icons/
+Disallow: /
+
+# Ausschluss von Archivierungs-Bots
+User-agent: ia_archiver
+Disallow: /
+
+# Cache-Kontrolle
+User-agent: *
+Disallow: /cache/
+Disallow: /tmp/
+Disallow: /temp/
+
+# Sitemap
+Sitemap: https://www.ressourcen-imperium.de/sitemap.xml
+
+# Host
+Host: https://www.ressourcen-imperium.de
+
+# Crawl-Rate Kontrolle
+Crawl-delay: 5
+
+# Zusätzliche Kommentare
+# Letzte Aktualisierung: 2024-04-09
+# Kontakt: webmaster@ressourcen-imperium.de
+# 
+# Bitte beachten Sie:
+# - Respektieren Sie die Crawl-Delays
+# - Keine automatisierten Spielzugriffe
+# - API-Endpunkte sind nicht für Crawler gedacht
+# - Benutzerprofile und Spielstände sind privat

@@ -1,204 +1,248 @@
-// gameLoop.js - Hauptspielschleife und Ressourcenberechnungen
+/**
+ * @fileoverview Spielschleife und Timing-Funktionen
+ * @author Ressourcen-Imperium Team
+ */
 
-import { gameState } from './gameState.js';
-import { isConverterActive } from './gameState.js';
-import { checkUnlocks } from './upgrades.js';
-import { updateDisplay, updateGameTime, updateProgressBar, updatePrestigeInfo } from './display.js';
-import { processMarketSales } from './market.js';
+import { GAME_CONFIG } from '../config/gameConfig.js';
 
-// Hauptspielschleife - wird jede Sekunde ausgeführt
-export function gameLoop() {
-    // Ressourcenproduktion durch Generatoren hinzufügen
-    Object.keys(gameState.production).forEach(resource => {
-        gameState.resources[resource] += gameState.production[resource];
-    });
-    
-    // Konverter verarbeiten
-    processConverters();
-    
-    // Marktstand-Verkäufe verarbeiten
-    processMarketSales();
-    
-    // UI aktualisieren
-    updateDisplay();
-    
-    // Spielzeit aktualisieren
-    updateGameTime();
-    
-    // Prüfen auf Freischaltungen basierend auf Ressourcenmengen
-    checkUnlocks();
-    
-    // Prestige-Informationen aktualisieren
-    updatePrestigeInfo();
-}
-
-// Berechnung der Ressourcenproduktion (inkl. Konverter)
-export function calculateProduction() {
-    // Produktion auf 0 zurücksetzen
-    Object.keys(gameState.production).forEach(resource => {
-        gameState.production[resource] = 0;
-    });
-    
-    // Produktion durch Generatoren berechnen
-    gameState.generators.forEach(generator => {
-        // Marktstand überspringen, da er keine Ressourcen produziert
-        if (generator.id === 'market') return;
+export class GameLoop {
+    constructor(game) {
+        this.game = game;
+        this.isRunning = false;
+        this.lastFrameTime = 0;
+        this.accumulator = 0;
+        this.frames = 0;
+        this.lastFpsUpdate = 0;
+        this.currentFps = 0;
+        this.fpsUpdateCallback = null;
+        this.frameId = null;
         
-        if (generator.amount > 0 && generator.resource !== 'none') {
-            gameState.production[generator.resource] += generator.baseOutput * generator.amount;
-        }
-    });
-    
-    // Produktion durch Konverter schätzen
-    // Diese Werte sind geschätzt und basieren auf der Annahme, dass genügend Eingangsressourcen vorhanden sind
-    gameState.converters.forEach(converter => {
-        // OPTIMIERUNG: Nur aktive Konverter berücksichtigen
-        if (converter.amount > 0 && isConverterActive(converter.id)) {
-            const operationsPerSecond = converter.baseSpeed * converter.amount;
-            
-            // Ausgangsressourcen berechnen
-            Object.keys(converter.output).forEach(resource => {
-                const productionPerSecond = operationsPerSecond * converter.output[resource];
-                gameState.production[resource] += productionPerSecond;
-            });
-            
-            // Verbrauch von Eingangsressourcen berechnen (als negative Produktion)
-            Object.keys(converter.input).forEach(resource => {
-                const consumptionPerSecond = operationsPerSecond * converter.input[resource];
-                gameState.production[resource] -= consumptionPerSecond;
-            });
-        }
-    });
-    
-    // Prestige-Multiplikator anwenden
-    Object.keys(gameState.production).forEach(resource => {
-        gameState.production[resource] *= gameState.prestigeMultiplier;
-    });
-}
-
-// Verbesserte Konvertierung von Ressourcen durch Konverter
-function processConverters() {
-    // Konverter-Status für die Akkumulation
-    if (!gameState.converterAccumulator) {
-        gameState.converterAccumulator = {};
+        // Konstanten
+        this.FIXED_TIMESTEP = 1000 / GAME_CONFIG.TICK_RATE;
+        this.MAX_FRAME_TIME = GAME_CONFIG.MAX_DELTA_TIME * 1000;
     }
-    
-    // Für jede Konverter-Instanz
-    gameState.converters.forEach(converter => {
-        // OPTIMIERUNG: Nur aktive Konverter verarbeiten
-        if (converter.amount > 0 && isConverterActive(converter.id)) {
-            const operationsPerSecond = converter.baseSpeed * converter.amount * gameState.prestigeMultiplier;
-            
-            // Akkumulator für diesen Konverter initialisieren, falls noch nicht vorhanden
-            if (!gameState.converterAccumulator[converter.id]) {
-                gameState.converterAccumulator[converter.id] = 0;
-            }
-            
-            // Akkumulator aktualisieren
-            gameState.converterAccumulator[converter.id] += operationsPerSecond;
-            
-            // Prüfen, ob genügend Ressourcen für mindestens eine Konvertierung vorhanden sind
-            let canConvert = true;
-            
-            // Überprüfen, ob genügend Eingangsressourcen vorhanden sind
-            Object.keys(converter.input).forEach(resource => {
-                if (gameState.resources[resource] < converter.input[resource]) {
-                    canConvert = false;
-                }
-            });
-            
-            // Vollständige Konvertierungen durchführen, wenn genügend akkumuliert wurde und Ressourcen verfügbar sind
-            while (gameState.converterAccumulator[converter.id] >= 1 && canConvert) {
-                // Eingangsressourcen verbrauchen
-                Object.keys(converter.input).forEach(resource => {
-                    gameState.resources[resource] -= converter.input[resource];
-                    
-                    // Überprüfen, ob nach dem Verbrauch noch genügend Ressourcen für weitere Konvertierungen vorhanden sind
-                    if (gameState.resources[resource] < converter.input[resource]) {
-                        canConvert = false;
-                    }
-                });
-                
-                // Nur wenn alle Ressourcen verfügbar waren
-                if (canConvert) {
-                    // Ausgangsressourcen produzieren
-                    Object.keys(converter.output).forEach(resource => {
-                        gameState.resources[resource] += converter.output[resource];
-                    });
-                    
-                    // Akkumulator reduzieren
-                    gameState.converterAccumulator[converter.id] -= 1;
-                }
-            }
-        }
-    });
-    
-    // Produktionsraten neu berechnen, wenn Konverter aktiv sind
-    let hasActiveConverters = false;
-    gameState.converters.forEach(converter => {
-        if (converter.amount > 0 && isConverterActive(converter.id)) {
-            hasActiveConverters = true;
-        }
-    });
-    
-    if (hasActiveConverters) {
-        // Aktualisierte Produktionsraten berechnen
-        calculateRealTimeProduction();
+
+    /**
+     * Startet die Spielschleife
+     */
+    start() {
+        if (this.isRunning) return;
+        
+        this.isRunning = true;
+        this.lastFrameTime = performance.now();
+        this.lastFpsUpdate = this.lastFrameTime;
+        this.frames = 0;
+        
+        this.loop(this.lastFrameTime);
     }
-}
 
-// OPTIMIERUNG: Aktualisiert die Produktionsraten basierend auf tatsächlichem Verbrauch/Produktion
-function calculateRealTimeProduction() {
-    // Temporäre Kopie der ursprünglichen Produktion erstellen
-    const baseProduction = {...gameState.production};
-    
-    // Tatsächliche Konverter-Produktion berechnen basierend auf verfügbaren Ressourcen
-    gameState.converters.forEach(converter => {
-        // Nur aktive Konverter berücksichtigen
-        if (converter.amount > 0 && isConverterActive(converter.id)) {
-            const operationsPerSecond = converter.baseSpeed * converter.amount * gameState.prestigeMultiplier;
-            
-            // Maximale mögliche Operationen basierend auf verfügbaren Eingangsressourcen berechnen
-            let maxPossibleOperations = operationsPerSecond;
-            
-            Object.keys(converter.input).forEach(resource => {
-                // Ressourcen, die pro Sekunde verfügbar sind (aktuelle + Produktion)
-                const availablePerSecond = (gameState.resources[resource] / 10) + baseProduction[resource];
-                
-                if (availablePerSecond <= 0) {
-                    // Keine Ressourcen verfügbar oder nur Verbrauch
-                    maxPossibleOperations = 0;
-                } else {
-                    // Maximale Operationen basierend auf dieser Ressource
-                    const possibleOps = availablePerSecond / converter.input[resource];
-                    maxPossibleOperations = Math.min(maxPossibleOperations, possibleOps);
-                }
-            });
-            
-            // Maximal möglichen Verbrauch und Produktion berechnen
-            if (maxPossibleOperations > 0) {
-                // Ausgangsressourcen (Produktion)
-                Object.keys(converter.output).forEach(resource => {
-                    const additionalProduction = maxPossibleOperations * converter.output[resource];
-                    gameState.production[resource] = baseProduction[resource] + additionalProduction;
-                });
-                
-                // Eingangsressourcen (Verbrauch, wird von der Produktion abgezogen)
-                Object.keys(converter.input).forEach(resource => {
-                    const consumption = maxPossibleOperations * converter.input[resource];
-                    // Nur abziehen, wenn es die Produktion nicht unter 0 senkt
-                    gameState.production[resource] = Math.max(0, baseProduction[resource] - consumption);
-                });
+    /**
+     * Pausiert die Spielschleife
+     */
+    pause() {
+        this.isRunning = false;
+        if (this.frameId !== null) {
+            cancelAnimationFrame(this.frameId);
+            this.frameId = null;
+        }
+    }
+
+    /**
+     * Setzt die Spielschleife fort
+     */
+    resume() {
+        if (!this.isRunning) {
+            this.start();
+        }
+    }
+
+    /**
+     * Die Hauptspielschleife
+     * @param {number} currentTime - Aktuelle Zeit in Millisekunden
+     * @private
+     */
+    loop(currentTime) {
+        if (!this.isRunning) return;
+
+        this.frameId = requestAnimationFrame(time => this.loop(time));
+
+        // Berechne vergangene Zeit
+        let deltaTime = currentTime - this.lastFrameTime;
+        this.lastFrameTime = currentTime;
+
+        // Verhindere zu große Zeitsprünge
+        if (deltaTime > this.MAX_FRAME_TIME) {
+            deltaTime = this.MAX_FRAME_TIME;
+        }
+
+        // Aktualisiere FPS-Zähler
+        this.updateFps(currentTime);
+
+        // Akkumuliere Zeit für feste Zeitschritte
+        this.accumulator += deltaTime;
+
+        // Führe Updates mit festen Zeitschritten durch
+        while (this.accumulator >= this.FIXED_TIMESTEP) {
+            try {
+                this.fixedUpdate(this.FIXED_TIMESTEP / 1000); // Konvertiere zu Sekunden
+            } catch (error) {
+                console.error('Fehler im fixedUpdate:', error);
+                this.handleError(error);
+            }
+            this.accumulator -= this.FIXED_TIMESTEP;
+        }
+
+        // Berechne Interpolationsfaktor
+        const alpha = this.accumulator / this.FIXED_TIMESTEP;
+
+        // Führe Rendering durch
+        try {
+            this.render(alpha);
+        } catch (error) {
+            console.error('Fehler im render:', error);
+            this.handleError(error);
+        }
+    }
+
+    /**
+     * Update mit festem Zeitschritt
+     * @param {number} deltaTime - Zeitschritt in Sekunden
+     * @private
+     */
+    fixedUpdate(deltaTime) {
+        // Aktualisiere Spiellogik
+        this.game.update(deltaTime);
+    }
+
+    /**
+     * Rendert das Spiel
+     * @param {number} interpolation - Interpolationsfaktor zwischen Updates
+     * @private
+     */
+    render(interpolation) {
+        // Aktualisiere UI mit Interpolation
+        this.game.uiManager.update(interpolation);
+    }
+
+    /**
+     * Aktualisiert FPS-Zähler
+     * @param {number} currentTime - Aktuelle Zeit
+     * @private
+     */
+    updateFps(currentTime) {
+        this.frames++;
+
+        if (currentTime > this.lastFpsUpdate + 1000) {
+            this.currentFps = Math.round(
+                (this.frames * 1000) / (currentTime - this.lastFpsUpdate)
+            );
+
+            this.lastFpsUpdate = currentTime;
+            this.frames = 0;
+
+            if (this.fpsUpdateCallback) {
+                this.fpsUpdateCallback(this.currentFps);
+            }
+
+            // Performance-Warnung bei niedrigen FPS
+            if (this.currentFps < 30) {
+                console.warn('Niedrige FPS:', this.currentFps);
+                this.checkPerformance();
             }
         }
-    });
-}
+    }
 
-// Initialisierung der regelmäßigen Aktualisierungen
-export function initGameLoops() {
-    // Hauptspielschleife - jede Sekunde
-    setInterval(gameLoop, 1000);
-    
-    // Häufigere Aktualisierung der Fortschrittsanzeige für flüssigere Animation
-    setInterval(updateProgressBar, 100);
+    /**
+     * Setzt den Callback für FPS-Updates
+     * @param {Function} callback - Callback-Funktion
+     */
+    setFpsUpdateHandler(callback) {
+        this.fpsUpdateCallback = callback;
+    }
+
+    /**
+     * Überprüft die Performance
+     * @private
+     */
+    checkPerformance() {
+        // Sammle Performance-Metriken
+        const metrics = {
+            memory: performance.memory ? {
+                usedJSHeapSize: performance.memory.usedJSHeapSize,
+                totalJSHeapSize: performance.memory.totalJSHeapSize,
+                jsHeapSizeLimit: performance.memory.jsHeapSizeLimit
+            } : null,
+            fps: this.currentFps,
+            timing: performance.timing
+        };
+
+        // Protokolliere Metriken
+        console.debug('Performance Metriken:', metrics);
+
+        // Führe Optimierungen durch wenn nötig
+        if (this.currentFps < 20) {
+            this.applyEmergencyOptimizations();
+        }
+    }
+
+    /**
+     * Führt Notfall-Optimierungen durch
+     * @private
+     */
+    applyEmergencyOptimizations() {
+        // Reduziere Partikeleffekte
+        if (this.game.settings.particleEffects) {
+            this.game.settings.particleEffects = false;
+            console.log('Partikeleffekte deaktiviert für bessere Performance');
+        }
+
+        // Reduziere UI-Update-Rate
+        this.game.uiManager.updateInterval *= 2;
+        console.log('UI-Update-Rate reduziert für bessere Performance');
+    }
+
+    /**
+     * Behandelt Fehler in der Spielschleife
+     * @param {Error} error - Aufgetretener Fehler
+     * @private
+     */
+    handleError(error) {
+        // Protokolliere Fehler
+        console.error('Spielschleifenfehler:', error);
+
+        // Versuche Wiederherstellung
+        try {
+            this.accumulator = 0; // Reset Akkumulator
+            this.lastFrameTime = performance.now();
+
+            // Benachrichtige Benutzer
+            this.game.uiManager.showNotification(
+                'Ein Fehler ist aufgetreten. Das Spiel versucht sich zu erholen.',
+                'error'
+            );
+
+        } catch (recoveryError) {
+            // Bei kritischem Fehler: Pausiere Spiel
+            console.error('Kritischer Fehler - Pausiere Spiel:', recoveryError);
+            this.pause();
+            
+            // Zeige Fehlerdialog
+            this.game.uiManager.showErrorDialog(
+                'Ein kritischer Fehler ist aufgetreten. Bitte lade das Spiel neu.'
+            );
+        }
+    }
+
+    /**
+     * Gibt den aktuellen Performance-Status zurück
+     * @returns {Object} Performance-Status
+     */
+    getPerformanceStatus() {
+        return {
+            fps: this.currentFps,
+            frameTime: performance.now() - this.lastFrameTime,
+            isRunning: this.isRunning,
+            accumulator: this.accumulator
+        };
+    }
 }

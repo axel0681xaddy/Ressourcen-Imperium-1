@@ -3,449 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ressourcen-Imperium - Ein IDLE-Game</title>
+    <title>Ressourcen-Imperium</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Statistik-Stylesheet einbinden -->
-    <link rel="stylesheet" href="css/statistics-styles.css">
-    <!-- Marktstand-Stylesheet einbinden -->
-    <link rel="stylesheet" href="css/market-styles.css">
-    <!-- Erkundungs-Stylesheet einbinden -->
-    <link rel="stylesheet" href="css/exploration-styles.css">
-    
-    <!-- Chart.js DIREKT einbinden BEVOR andere Scripts geladen werden -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    
-    <!-- LZUTF8 Komprimierungs-Bibliothek für verbesserte Speicherung -->
-    <script src="https://cdn.jsdelivr.net/npm/lzutf8/build/production/lzutf8.min.js"></script>
-    
-    <!-- Speicher UI Styles -->
-    <style>
-        /* Verbesserte Button-Stile */
-        .action-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .action-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .save-button {
-            background-color: #2ecc71;
-        }
-        
-        .save-button:hover {
-            background-color: #27ae60;
-        }
-        
-        .load-button {
-            background-color: #3498db;
-        }
-        
-        .load-button:hover {
-            background-color: #2980b9;
-        }
-        
-        .secondary-button {
-            background-color: #ecf0f1;
-            color: #34495e;
-            border: 1px solid #bdc3c7;
-            padding: 8px 15px;
-            font-size: 14px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        
-        .secondary-button:hover {
-            background-color: #bdc3c7;
-            transform: translateY(-2px);
-        }
-        
-        .danger-button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            font-size: 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .danger-button:hover {
-            background-color: #c0392b;
-            transform: translateY(-2px);
-        }
-        
-        .button-icon {
-            font-size: 18px;
-        }
-        
-        /* Für responsive Design */
-        @media (max-width: 768px) {
-            .button-text {
-                display: none;
-            }
-            
-            .action-button, .secondary-button, .danger-button {
-                padding: 10px;
-                border-radius: 50%;
-                width: 45px;
-                height: 45px;
-            }
-            
-            .button-icon {
-                font-size: 22px;
-            }
-        }
-    </style>
+    <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+    <!-- Lade Schriftarten vorab -->
+    <link rel="preload" href="assets/fonts/game-font.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
-    <h1>Ressourcen-Imperium</h1>
-    <div class="container">
-        <div class="resources-panel">
-            <div class="game-section">
+    <!-- Hauptcontainer -->
+    <div id="game-container">
+        <!-- Header-Bereich -->
+        <header id="game-header">
+            <h1>Ressourcen-Imperium</h1>
+            <div id="top-bar">
+                <div id="prestige-info">
+                    <span>Prestige Level: </span>
+                    <span id="prestige-level">0</span>
+                </div>
+                <div id="menu-buttons">
+                    <button id="settings-button" class="icon-button" title="Einstellungen">
+                        <img src="assets/icons/settings.png" alt="Einstellungen">
+                    </button>
+                    <button id="save-button" class="icon-button" title="Spiel speichern">
+                        <img src="assets/icons/save.png" alt="Speichern">
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hauptspielbereich -->
+        <main id="game-content">
+            <!-- Ressourcen-Bereich -->
+            <section id="resources-section" class="game-section">
                 <h2>Ressourcen</h2>
-                <!-- Primary Resources -->
-                <div id="primary-resources">
-                    <h3>Primäre Ressourcen</h3>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon coin-icon"></span>
-                            <span id="coins">0</span> Münzen
+                <div id="resources-container" class="grid-container">
+                    <!-- Ressourcen werden dynamisch eingefügt -->
+                </div>
+            </section>
+
+            <!-- Upgrade-Bereich -->
+            <section id="upgrades-section" class="game-section">
+                <h2>Verbesserungen</h2>
+                <div id="upgrades-container" class="grid-container">
+                    <!-- Upgrades werden dynamisch eingefügt -->
+                </div>
+            </section>
+
+            <!-- Achievement-Bereich -->
+            <section id="achievements-section" class="game-section">
+                <h2>Erfolge</h2>
+                <div id="achievements-container" class="grid-container">
+                    <!-- Achievements werden dynamisch eingefügt -->
+                </div>
+            </section>
+
+            <!-- Statistik-Bereich -->
+            <section id="statistics-section" class="game-section">
+                <h2>Statistiken</h2>
+                <div id="statistics-container">
+                    <!-- Statistiken werden dynamisch eingefügt -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Benachrichtigungsbereich -->
+        <div id="notifications-container"></div>
+
+        <!-- Modaler Dialog für Einstellungen -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <h2>Einstellungen</h2>
+                <div id="settings-container">
+                    <div class="settings-group">
+                        <h3>Allgemein</h3>
+                        <div class="setting-item">
+                            <label for="setting-autosave">Automatisches Speichern</label>
+                            <input type="checkbox" id="setting-autosave" checked>
                         </div>
-                        <div><span id="coins-per-second">0.0</span>/s</div>
+                        <div class="setting-item">
+                            <label for="setting-offline-progress">Offline-Fortschritt</label>
+                            <input type="checkbox" id="setting-offline-progress" checked>
+                        </div>
                     </div>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon wood-icon"></span>
-                            <span id="wood">0</span> Holz
+
+                    <div class="settings-group">
+                        <h3>Audio</h3>
+                        <div class="setting-item">
+                            <label for="setting-sound">Soundeffekte</label>
+                            <input type="checkbox" id="setting-sound" checked>
                         </div>
-                        <div><span id="wood-per-second">0.0</span>/s</div>
+                        <div class="setting-item">
+                            <label for="setting-volume">Lautstärke</label>
+                            <input type="range" id="setting-volume" min="0" max="100" value="50">
+                        </div>
                     </div>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon stone-icon"></span>
-                            <span id="stone">0</span> Stein
+
+                    <div class="settings-group">
+                        <h3>Grafik</h3>
+                        <div class="setting-item">
+                            <label for="setting-particles">Partikeleffekte</label>
+                            <input type="checkbox" id="setting-particles" checked>
                         </div>
-                        <div><span id="stone-per-second">0.0</span>/s</div>
+                        <div class="setting-item">
+                            <label for="setting-animations">Animationen</label>
+                            <input type="checkbox" id="setting-animations" checked>
+                        </div>
                     </div>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon iron-icon"></span>
-                            <span id="iron">0</span> Eisen
+
+                    <div class="settings-group">
+                        <h3>Spielstand</h3>
+                        <div class="setting-buttons">
+                            <button id="export-save">Spielstand exportieren</button>
+                            <button id="import-save">Spielstand importieren</button>
+                            <button id="reset-game" class="danger-button">Spiel zurücksetzen</button>
                         </div>
-                        <div><span id="iron-per-second">0.0</span>/s</div>
-                    </div>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon copper-icon"></span>
-                            <span id="copper">0</span> Kupfer
-                        </div>
-                        <div><span id="copper-per-second">0.0</span>/s</div>
                     </div>
                 </div>
-                
-                <!-- Secondary Resources -->
-                <div id="secondary-resources">
-                    <h3>Sekundäre Ressourcen</h3>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon plank-icon"></span>
-                            <span id="planks">0</span> Bretter
-                        </div>
-                        <div><span id="planks-per-second">0.0</span>/s</div>
-                    </div>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon brick-icon"></span>
-                            <span id="bricks">0</span> Ziegel
-                        </div>
-                        <div><span id="bricks-per-second">0.0</span>/s</div>
-                    </div>
-                </div>
-                
-                <!-- Tertiary Resources -->
-                <div id="tertiary-resources">
-                    <h3>Hochwertige Güter</h3>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon tool-icon"></span>
-                            <span id="tools">0</span> Werkzeuge
-                        </div>
-                        <div><span id="tools-per-second">0.0</span>/s</div>
-                    </div>
-                    <div class="resource-display">
-                        <div>
-                            <span class="resource-icon jewelry-icon"></span>
-                            <span id="jewelry">0</span> Schmuck
-                        </div>
-                        <div><span id="jewelry-per-second">0.0</span>/s</div>
-                    </div>
-                </div>
-                
-                <button id="click-btn">Sammeln</button>
-                
-                <div class="progress-bar">
-                    <div class="progress" id="progress-bar"></div>
-                </div>
-                
-                <div class="stats">
-                    <div>Gesamtklicks: <span id="total-clicks">0</span></div>
-                    <div>Spielzeit: <span id="play-time">0m 0s</span></div>
-                </div>
-            </div>
-            
-            <div class="game-section">
-                <h2>Produktionsketten</h2>
-                <div id="production-chains">
-                    <!-- Plank Production Chain -->
-                    <div class="production-chain">
-                        <div class="production-chain-item">
-                            <span class="resource-icon wood-icon"></span> 
-                            <span>2 Holz</span>
-                        </div>
-                        <div class="arrow">→</div>
-                        <div class="production-chain-item">
-                            <span class="resource-icon plank-icon"></span>
-                            <span>1 Brett</span>
-                        </div>
-                        <div class="stats">Wert: 1.5x</div>
-                    </div>
-                    
-                    <!-- Brick Production Chain -->
-                    <div class="production-chain">
-                        <div class="production-chain-item">
-                            <span class="resource-icon stone-icon"></span>
-                            <span>3 Stein</span>
-                        </div>
-                        <div class="arrow">→</div>
-                        <div class="production-chain-item">
-                            <span class="resource-icon brick-icon"></span>
-                            <span>1 Ziegel</span>
-                        </div>
-                        <div class="stats">Wert: 2x</div>
-                    </div>
-                    
-                    <!-- Tool Production Chain -->
-                    <div class="production-chain">
-                        <div class="production-chain-item">
-                            <span class="resource-icon iron-icon"></span>
-                            <span>2 Eisen</span>
-                        </div>
-                        <div class="arrow">+</div>
-                        <div class="production-chain-item">
-                            <span class="resource-icon plank-icon"></span>
-                            <span>1 Brett</span>
-                        </div>
-                        <div class="arrow">→</div>
-                        <div class="production-chain-item">
-                            <span class="resource-icon tool-icon"></span>
-                            <span>1 Werkzeug</span>
-                        </div>
-                        <div class="stats">Wert: 3x</div>
-                    </div>
-                    
-                    <!-- Jewelry Production Chain -->
-                    <div class="production-chain">
-                        <div class="production-chain-item">
-                            <span class="resource-icon copper-icon"></span>
-                            <span>2 Kupfer</span>
-                        </div>
-                        <div class="arrow">+</div>
-                        <div class="production-chain-item">
-                            <span class="resource-icon iron-icon"></span>
-                            <span>1 Eisen</span>
-                        </div>
-                        <div class="arrow">→</div>
-                        <div class="production-chain-item">
-                            <span class="resource-icon jewelry-icon"></span>
-                            <span>1 Schmuck</span>
-                        </div>
-                        <div class="stats">Wert: 4x</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="game-section">
-                <h2>Errungenschaften</h2>
-                <div id="achievements-container">
-                    <!-- Achievements will be dynamically added here -->
-                </div>
+                <button id="close-settings" class="close-button">Schließen</button>
             </div>
         </div>
-        
-        <div class="main-panel">
-            <div class="tabs">
-                <div class="tab active" data-tab="resource-generators">Ressourcen-Sammler</div>
-                <div class="tab" data-tab="converters">Konverter</div>
-                <div class="tab" data-tab="upgrades">Verbesserungen</div>
-                <div class="tab" data-tab="market">Marktstand</div>
-                <div class="tab" data-tab="prestige">Prestige</div>
-                <!-- Tab für Statistiken -->
-                <div class="tab" data-tab="statistics">Statistiken</div>
-                <!-- Tab für Erkundung -->
-                <div class="tab" data-tab="exploration">Erkundung</div>
-            </div>
-            
-            <div class="game-section">
-                <div class="tab-content active" id="resource-generators">
-                    <h2>Ressourcen-Sammler</h2>
-                    <div id="resource-generators-container">
-                        <!-- Resource Generators will be dynamically added here -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="converters">
-                    <h2>Ressourcen-Konverter</h2>
-                    <div id="converters-container">
-                        <!-- Converters will be dynamically added here -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="upgrades">
-                    <h2>Verbesserungen</h2>
-                    <div id="upgrades-container">
-                        <!-- Upgrades will be dynamically added here -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="market">
-                    <h2>Marktstand</h2>
-                    <p>Verkaufe deine Ressourcen auf dem Markt, um Münzen zu verdienen.</p>
-                    <div id="market-sales-container">
-                        <!-- Wird dynamisch durch market.js gefüllt -->
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="prestige">
-                    <h2>Prestige</h2>
-                    <p>Wenn du genug Ressourcen gesammelt hast, kannst du ein Prestige durchführen, um Bonus-Multiplikatoren zu erhalten.</p>
-                    <div class="resource-display">
-                        Prestige-Punkte beim Reset: <span id="prestige-points">0</span>
-                    </div>
-                    <button id="prestige-btn" disabled>Prestige durchführen (Benötigt 1.000.000 Münzen)</button>
-                    
-                    <div class="stats">
-                        <div>Aktueller Prestige-Multiplikator: <span id="prestige-multiplier">1.0</span>x</div>
-                        <div>Anzahl Prestige-Resets: <span id="prestige-resets">0</span></div>
-                    </div>
-                </div>
-                
-                <!-- Tab-Inhalt für Statistiken -->
-                <div class="tab-content" id="statistics">
-                    <!-- Dieser Inhalt wird durch statisticsDisplay.js dynamisch generiert -->
-                </div>
-                
-                <!-- Tab-Inhalt für Erkundung -->
-                <div class="tab-content" id="exploration">
-                    <!-- Dieser Inhalt wird durch renderExplorationTab() dynamisch generiert -->
+
+        <!-- Modaler Dialog für Prestige -->
+        <div id="prestige-modal" class="modal">
+            <div class="modal-content">
+                <h2>Prestige</h2>
+                <p>Möchtest du wirklich ein Prestige durchführen? Du erhältst folgende Boni:</p>
+                <div id="prestige-bonuses"></div>
+                <div class="modal-buttons">
+                    <button id="confirm-prestige">Bestätigen</button>
+                    <button id="cancel-prestige">Abbrechen</button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- HIER IST DER VERÄNDERTE SPIELEINSTELLUNGEN-BEREICH -->
-    <div class="game-section" style="text-align: center; margin-top: 20px;">
-        <h3>Spieleinstellungen</h3>
-        
-        <!-- Vereinfachte Export/Import-Buttons -->
-        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
-            <button id="export-game-button" class="action-button save-button">
-                <span class="button-icon">💾</span>
-                <span class="button-text">Spielstand exportieren</span>
-            </button>
-            <button id="import-game-button" class="action-button load-button">
-                <span class="button-icon">📂</span>
-                <span class="button-text">Spielstand importieren</span>
-            </button>
-        </div>
-        
-        <!-- Reset-Button -->
-        <button id="reset-button" class="danger-button">
-            <span class="button-icon">🗑️</span>
-            <span class="button-text">Spielstand zurücksetzen</span>
-        </button>
+
+    <!-- Audio-Elemente -->
+    <audio id="sound-click" preload="auto" src="assets/sounds/click.mp3"></audio>
+    <audio id="sound-upgrade" preload="auto" src="assets/sounds/upgrade.mp3"></audio>
+    <audio id="sound-achievement" preload="auto" src="assets/sounds/achievement.mp3"></audio>
+    <audio id="sound-error" preload="auto" src="assets/sounds/error.mp3"></audio>
+
+    <!-- Lade Scripts -->
+    <script type="module" src="js/app.js"></script>
+
+    <!-- Entwickler-Tools (nur im Debug-Modus) -->
+    <div id="dev-tools" style="display: none;">
+        <div id="fps-counter"></div>
+        <div id="debug-info"></div>
     </div>
-    
-    <!-- Modulare JavaScript-Dateien -->
-    <script type="module" src="js/main.js"></script>
-    
-    <!-- Neue Module für Statistiken -->
-    <script type="module" src="js/statistics.js"></script>
-    <script type="module" src="js/statisticsDisplay.js"></script>
-    
-    <!-- Neue Module für verbesserte Speicherfunktion -->
-    <script type="module" src="js/storage.js"></script>
-    <script type="module" src="js/compression.js"></script>
-    <script type="module" src="js/saveUI.js"></script>
-    
-    <!-- Modul für das Erkundungssystem -->
-    <script type="module" src="js/exploration.js"></script>
-    
-    <!-- Debugging-Hilfscode - ohne Debug-Button -->
-    <script type="module">
-        // Importiere die neue Reset-Funktion
-        import { handleResetGame } from './js/main.js';
-        
-        // Reset-Button mit der neuen Funktion verbinden
-        document.getElementById('reset-button').addEventListener('click', function() {
-            handleResetGame();
-        });
-        
-        // Export-Button mit entsprechender Funktion verbinden
-        document.getElementById('export-game-button').addEventListener('click', function() {
-            // Exportfunktion aufrufen
-            import('./js/storage.js').then(module => {
-                module.exportSave();
+
+    <!-- Lade Service Worker für PWA-Support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
             });
-        });
-        
-        // Import-Button mit entsprechender Funktion verbinden
-        document.getElementById('import-game-button').addEventListener('click', function() {
-            // Import-Modal öffnen
-            import('./js/saveUI.js').then(module => {
-                // Rufe direkt die openImportModal Funktion auf, falls verfügbar
-                if (typeof window.openImportModal === 'function') {
-                    window.openImportModal();
-                } else {
-                    // Sonst die einfache Datei-Upload-Methode verwenden
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = '.json';
-                    
-                    input.onchange = function(event) {
-                        if (event.target.files.length > 0) {
-                            import('./js/storage.js').then(storageModule => {
-                                storageModule.importSave(event.target.files[0]);
-                            });
-                        }
-                    };
-                    
-                    input.click();
-                }
-            });
-        });
+        }
     </script>
 </body>
 </html>
