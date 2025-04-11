@@ -1,0 +1,171 @@
+version: '3.8'
+
+services:
+  # Frontend (Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: game2-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./dist:/usr/share/nginx/html
+      - ./docker/frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/frontend/ssl:/etc/nginx/ssl:ro
+      - frontend_cache:/var/cache/nginx
+    depends_on:
+      - backend
+    networks:
+      - game-network
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend (Node.js)
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    container_name: game2-backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - backend_node_modules:/app/node_modules
+    depends_on:
+      - database
+      - redis
+    networks:
+      - game-network
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=database
+      - DB_PORT=3306
+      - DB_NAME=game2_db
+      - DB_USER=game2_user
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Datenbank (MySQL)
+  database:
+    image: mysql:8.0
+    container_name: game2-database
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf:/etc/mysql/conf.d
+    networks:
+      - game-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=game2_db
+      - MYSQL_USER=game2_user
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis (Cache)
+  redis:
+    image: redis:alpine
+    container_name: game2-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - game-network
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PHPMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: game2-phpmyadmin
+    ports:
+      - "8080:80"
+    depends_on:
+      - database
+    networks:
+      - game-network
+    environment:
+      - PMA_HOST=database
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    restart: unless-stopped
+
+  # Monitoring (Prometheus + Grafana)
+  prometheus:
+    image: prom/prometheus
+    container_name: game2-prometheus
+    volumes:
+      - ./docker/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - game-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: game2-grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - game-network
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+  frontend_cache:
+  backend_node_modules:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  game-network:
+    driver: bridge
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+  mysql_root_password:
+    file: ./secrets/mysql_root_password.txt
+  grafana_password:
+    file: ./secrets/grafana_password.txt

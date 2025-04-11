@@ -1,0 +1,143 @@
+{
+  "compilerOptions": {
+    // Projekt-Einstellungen
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext",
+      "WebWorker"
+    ],
+    "jsx": "preserve",
+    "useDefineForClassFields": true,
+    
+    // Module-Einstellungen
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@managers/*": ["src/managers/*"],
+      "@utils/*": ["src/utils/*"],
+      "@assets/*": ["src/assets/*"]
+    },
+    "types": [
+      "vite/client",
+      "jest",
+      "node"
+    ],
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true,
+
+    // Emit-Einstellungen
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "removeComments": true,
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "noEmit": true,
+
+    // Strikte Typ-Prüfung
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+    "alwaysStrict": true,
+
+    // Zusätzliche Prüfungen
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    // Interop-Einstellungen
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "preserveSymlinks": true,
+
+    // Experimentelle Einstellungen
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Erweiterte Einstellungen
+    "skipLibCheck": true,
+    "allowArbitraryExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noErrorTruncation": true,
+
+    // Inkrementelle Builds
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo",
+
+    // Plugin-Einstellungen
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "customMatcher": "\\.module\\.(c|le|sa|sc)ss$"
+        }
+      }
+    ]
+  },
+  
+  // Projekt-Referenzen
+  "references": [
+    { "path": "./tsconfig.node.json" }
+  ],
+
+  // Einzubeziehende/Auszuschließende Dateien
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
+
+  // Typ-Definitionen
+  "typeAcquisition": {
+    "enable": true,
+    "include": [
+      "jest",
+      "node"
+    ]
+  },
+
+  // Erweiterte Projekt-Einstellungen
+  "compileOnSave": false,
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  
+  // Watch-Optionen
+  "watchOptions": {
+    "watchFile": "useFsEvents",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority",
+    "synchronousWatchDirectory": true,
+    "excludeDirectories": ["**/node_modules", "dist"]
+  }
+}

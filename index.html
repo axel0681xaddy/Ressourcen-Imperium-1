@@ -4,166 +4,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ressourcen-Imperium</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" type="image/png" href="assets/icons/favicon.png">
-    <!-- Lade Schriftarten vorab -->
-    <link rel="preload" href="assets/fonts/game-font.woff2" as="font" type="font/woff2" crossorigin>
+	<!-- Favicon Links hinzufügen -->
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAGCSURBVFhH7ZY9TsNAEIX3HKG4AaKiQhwBCQ6AqGhpoYQj0FJxCzoKJCSucIQU1PQUFNDQcQUOgPKtzDiKs/b+xEml/KTR7O7szryZ2bVTVCaTyWQymUwXuq5bR3NnK+MwXPeS0QP4J+i1rTwPw7YS0QK8g+CzUE8uqCcV9ARPjGijNzPVkwnqwZvj0UdvZqonEdSCL8ehj97MVJcPasGTR6GPXsxUlw9qwZNHoY9ezFSXD2qZPP4t9NGbmerxQR3TZu4WffRmpno8UOPKhF+9oI/ezFQfD2pcmPBfD+ijNzPVx4MalyZ8+g599GamejyoYdrs3aCPXsxUnw9qwZPHoY9ezFSXD2rBk0ehj17MVJcPasGTR6GPXsxUlw9qwZNHoY9ezFSXD2rdmvDpR+ijNzPV5YNa9yb86kf00ZuZ6vJBLXjyKPTRi5nq8kEtePIo9NGLmeryQS148ij00YuZ6vJBLXjyKPTRi5nq8kEtePIo9NGLmeryQa1HE379jD56M1M9k8lkMplMpgNF8Q3VAqduB/GFkwAAAABJRU5ErkJggg==">
+    <link rel="icon" type="image/png" sizes="16x16" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABsSURBVDhP7Y1BCsAwCAR9Qv7/wfYvPfUHhpBLbA9tIXQgs4fVXQhmJgQzE0I7iMijdUL3EZD/SlUvPK0Tuq+QrhBPXZ+BJ3RfIX2FtM5O6L5CvEJE5tE6ofsI6b/wN8QTQZ6BJ4IQzEwIZuXsFgiy7MXFP43WAAAAAElFTkSuQmCC">
+    <link rel="stylesheet" href="/Game2/assets/css/styles.css">
 </head>
 <body>
-    <!-- Hauptcontainer -->
-    <div id="game-container">
-        <!-- Header-Bereich -->
-        <header id="game-header">
-            <h1>Ressourcen-Imperium</h1>
-            <div id="top-bar">
-                <div id="prestige-info">
-                    <span>Prestige Level: </span>
-                    <span id="prestige-level">0</span>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fullscreen-overlay">
+        <div class="loading-container">
+            <div class="loading-title">🏰 Ressourcen-Imperium</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p class="loading-text">Lade Spiel...</p>
+            <p class="loading-error" style="color: red; display: none;"></p>
+        </div>
+    </div>
+
+    <!-- Hauptspiel-Container -->
+    <div id="game-container" class="">
+        <!-- Header -->
+        <header class="game-header">
+            <div class="resource-bar">
+                <div class="resource" data-resource="wood">
+                    🌳 Holz: 
+                    <span class="resource-amount">0</span>/<span class="resource-storage">100</span>
+                    (<span class="resource-rate">+0</span>/s)
                 </div>
-                <div id="menu-buttons">
-                    <button id="settings-button" class="icon-button" title="Einstellungen">
-                        <img src="assets/icons/settings.png" alt="Einstellungen">
-                    </button>
-                    <button id="save-button" class="icon-button" title="Spiel speichern">
-                        <img src="assets/icons/save.png" alt="Speichern">
-                    </button>
+                <div class="resource" data-resource="stone">
+                    🪨 Stein: 
+                    <span class="resource-amount">0</span>/<span class="resource-storage">50</span>
+                    (<span class="resource-rate">+0</span>/s)
                 </div>
+            </div>
+            <div class="menu-buttons">
+                <button id="settings-button" class="icon-button">⚙️</button>
+                <button id="save-button" class="icon-button">💾</button>
             </div>
         </header>
 
         <!-- Hauptspielbereich -->
-        <main id="game-content">
-            <!-- Ressourcen-Bereich -->
-            <section id="resources-section" class="game-section">
-                <h2>Ressourcen</h2>
-                <div id="resources-container" class="grid-container">
-                    <!-- Ressourcen werden dynamisch eingefügt -->
+        <main class="game-main">
+            <!-- Gebäude-Bereich -->
+            <section id="buildings" class="game-section">
+                <h2>Gebäude</h2>
+                <div class="buildings-grid">
+                    <div class="building" data-building="woodcutter">
+                        🪓 Holzfäller
+                        <div class="building-cost">Kosten: 10 Holz</div>
+                        <div class="building-level">Level: 1</div>
+                        <div class="building-production">Produktion: 0.5 Holz/s</div>
+                        <button class="upgrade-button">Verbessern</button>
+                    </div>
+                    <div class="building" data-building="quarry">
+                        ⛏️ Steinbruch
+                        <div class="building-cost">Kosten: 50 Holz, 10 Stein</div>
+                        <div class="building-level">Level: 0</div>
+                        <div class="building-production">Produktion: 0.3 Stein/s</div>
+                        <button class="upgrade-button">Verbessern</button>
+                    </div>
                 </div>
             </section>
 
-            <!-- Upgrade-Bereich -->
-            <section id="upgrades-section" class="game-section">
+            <!-- Upgrades-Bereich -->
+            <section id="upgrades" class="game-section">
                 <h2>Verbesserungen</h2>
-                <div id="upgrades-container" class="grid-container">
-                    <!-- Upgrades werden dynamisch eingefügt -->
+                <div class="upgrades-list">
+                    <div class="upgrade" data-upgrade="BETTER_TOOLS">
+                        🛠️ Bessere Werkzeuge
+                        <div class="upgrade-cost">100 Holz, 50 Stein</div>
+                        <div class="upgrade-effect">+50% Produktion</div>
+                        <button class="buy-button">Kaufen</button>
+                    </div>
+                    <div class="upgrade" data-upgrade="LARGER_STORAGE">
+                        📦 Größerer Speicher
+                        <div class="upgrade-cost">90 Holz, 50 Stein</div>
+                        <div class="upgrade-effect">+100% Speicherkapazität</div>
+                        <button class="buy-button">Kaufen</button>
+                    </div>
                 </div>
             </section>
 
-            <!-- Achievement-Bereich -->
-            <section id="achievements-section" class="game-section">
+            <!-- Achievements-Bereich -->
+            <section id="achievements" class="game-section">
                 <h2>Erfolge</h2>
-                <div id="achievements-container" class="grid-container">
-                    <!-- Achievements werden dynamisch eingefügt -->
-                </div>
-            </section>
-
-            <!-- Statistik-Bereich -->
-            <section id="statistics-section" class="game-section">
-                <h2>Statistiken</h2>
-                <div id="statistics-container">
-                    <!-- Statistiken werden dynamisch eingefügt -->
+                <div class="achievements-grid">
+                    <div class="achievement" data-achievement="wood-collector">
+                        🎯 Holzsammler
+                        <div class="achievement-progress">0/1000</div>
+                    </div>
                 </div>
             </section>
         </main>
 
-        <!-- Benachrichtigungsbereich -->
-        <div id="notifications-container"></div>
-
-        <!-- Modaler Dialog für Einstellungen -->
-        <div id="settings-modal" class="modal">
-            <div class="modal-content">
-                <h2>Einstellungen</h2>
-                <div id="settings-container">
-                    <div class="settings-group">
-                        <h3>Allgemein</h3>
-                        <div class="setting-item">
-                            <label for="setting-autosave">Automatisches Speichern</label>
-                            <input type="checkbox" id="setting-autosave" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label for="setting-offline-progress">Offline-Fortschritt</label>
-                            <input type="checkbox" id="setting-offline-progress" checked>
-                        </div>
-                    </div>
-
-                    <div class="settings-group">
-                        <h3>Audio</h3>
-                        <div class="setting-item">
-                            <label for="setting-sound">Soundeffekte</label>
-                            <input type="checkbox" id="setting-sound" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label for="setting-volume">Lautstärke</label>
-                            <input type="range" id="setting-volume" min="0" max="100" value="50">
-                        </div>
-                    </div>
-
-                    <div class="settings-group">
-                        <h3>Grafik</h3>
-                        <div class="setting-item">
-                            <label for="setting-particles">Partikeleffekte</label>
-                            <input type="checkbox" id="setting-particles" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label for="setting-animations">Animationen</label>
-                            <input type="checkbox" id="setting-animations" checked>
-                        </div>
-                    </div>
-
-                    <div class="settings-group">
-                        <h3>Spielstand</h3>
-                        <div class="setting-buttons">
-                            <button id="export-save">Spielstand exportieren</button>
-                            <button id="import-save">Spielstand importieren</button>
-                            <button id="reset-game" class="danger-button">Spiel zurücksetzen</button>
-                        </div>
-                    </div>
-                </div>
-                <button id="close-settings" class="close-button">Schließen</button>
+        <!-- Footer -->
+        <footer class="game-footer">
+            <div class="stats">
+                <span>Spielzeit: <span id="playtime">00:00:00</span></span>
+                <span>Gesamtproduktion: <span id="total-production">0</span></span>
             </div>
-        </div>
+            <div class="version">v1.0.0</div>
+        </footer>
+    </div>
 
-        <!-- Modaler Dialog für Prestige -->
-        <div id="prestige-modal" class="modal">
-            <div class="modal-content">
-                <h2>Prestige</h2>
-                <p>Möchtest du wirklich ein Prestige durchführen? Du erhältst folgende Boni:</p>
-                <div id="prestige-bonuses"></div>
-                <div class="modal-buttons">
-                    <button id="confirm-prestige">Bestätigen</button>
-                    <button id="cancel-prestige">Abbrechen</button>
+    <!-- Modals -->
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>⚙️ Einstellungen</h2>
+            <div class="settings-grid">
+                <div class="setting">
+                    <label for="sound-volume">🔊 Soundeffekte</label>
+                    <input type="range" id="sound-volume" min="0" max="100" value="50">
+                </div>
+                <div class="setting">
+                    <label for="music-volume">🎵 Musik</label>
+                    <input type="range" id="music-volume" min="0" max="100" value="30">
+                </div>
+                <div class="setting">
+                    <label for="notifications">🔔 Benachrichtigungen</label>
+                    <input type="checkbox" id="notifications" checked>
                 </div>
             </div>
+            <button class="close-modal">Schließen</button>
         </div>
     </div>
 
-    <!-- Audio-Elemente -->
-    <audio id="sound-click" preload="auto" src="assets/sounds/click.mp3"></audio>
-    <audio id="sound-upgrade" preload="auto" src="assets/sounds/upgrade.mp3"></audio>
-    <audio id="sound-achievement" preload="auto" src="assets/sounds/achievement.mp3"></audio>
-    <audio id="sound-error" preload="auto" src="assets/sounds/error.mp3"></audio>
+    <!-- Benachrichtigungen -->
+    <div id="notification-container"></div>
 
-    <!-- Lade Scripts -->
-    <script type="module" src="js/app.js"></script>
-
-    <!-- Entwickler-Tools (nur im Debug-Modus) -->
-    <div id="dev-tools" style="display: none;">
-        <div id="fps-counter"></div>
-        <div id="debug-info"></div>
-    </div>
-
-    <!-- Lade Service Worker für PWA-Support -->
+    <!-- Error Handler -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen && !loadingScreen.classList.contains('hidden')) {
+                document.querySelector('.loading-error').style.display = 'block';
+                document.querySelector('.loading-error').textContent = 
+                    'Das Spiel konnte nicht geladen werden. Bitte prüfen Sie die Konsole auf Fehler.';
+            }
+        }, 5000);
+    </script>
+
+    <!-- Game Scripts -->
+    <script type="module">
+        try {
+            console.log("Starte Spiel-Initialisierung...");
+            
+            document.addEventListener('DOMContentLoaded', async () => {
+                try {
+                    console.log("DOM geladen, importiere Module...");
+                    
+                    const { GAME_CONFIG } = await import('/Game2/assets/js/gameConfig.js');
+                    console.log("GameConfig geladen:", GAME_CONFIG);
+                    
+                    const gameModule = await import('/Game2/assets/js/app.js');
+                    console.log("Spiel-Modul geladen");
+                    
+                    console.log("Spiel erfolgreich initialisiert");
+                } catch (error) {
+                    console.error("Fehler beim Laden der Module:", error);
+                    document.querySelector('.loading-error').style.display = 'block';
+                    document.querySelector('.loading-error').textContent = 
+                        'Fehler beim Laden der Spielmodule: ' + error.message;
+                }
             });
+        } catch (error) {
+            console.error("Kritischer Fehler:", error);
+            document.querySelector('.loading-error').style.display = 'block';
+            document.querySelector('.loading-error').textContent = 
+                'Kritischer Fehler: ' + error.message;
         }
     </script>
 </body>

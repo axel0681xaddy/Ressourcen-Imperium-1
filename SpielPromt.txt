@@ -1,0 +1,279 @@
+RESSOURCEN-IMPERIUM SPEZIFIKATION v1.1
+
+PROJEKTÜBERSICHT:
+Ein Browser-basiertes Idle/Clicker-Ressourcenmanagement-Spiel, entwickelt als Progressive Web App (PWA).
+
+TECHNOLOGIE-STACK:
+- Vanilla JavaScript (ES6+ Modules)
+- HTML5
+- CSS3
+- Service Worker für Offline-Funktionalität
+- LocalStorage für Spielstandspeicherung
+
+DATEISTRUKTUR:
+/Game2/
+├── assets/
+│   ├── css/
+│   │   ├── styles.css           # Hauptstylesheet
+│   │   ├── components.css       # Wiederverwendbare UI-Komponenten
+│   │   └── themes.css           # Farbschema und Theming
+│   └── js/
+│       ├── app.js              # Hauptanwendung (max 500 Zeilen)
+│       ├── gameConfig.js       # Spielkonfiguration
+│       ├── modules/
+│       │   ├── resources.js    # Ressourcenverwaltung
+│       │   ├── buildings.js    # Gebäudeverwaltung
+│       │   ├── upgrades.js     # Upgrade-System
+│       │   ├── achievements.js  # Achievement-System
+│       │   └── storage.js      # Speicherverwaltung
+│       └── utils/
+│           ├── calculations.js  # Berechnungsfunktionen
+│           ├── ui.js           # UI-Hilfsfunktionen
+│           └── notifications.js # Benachrichtigungssystem
+├── index.html              # Haupt-HTML-Datei
+├── manifest.json           # PWA-Manifest
+└── service-worker.js       # Offline-Funktionalität
+
+GIT-REPOSITORY-ANALYSE:
+Vor jeder Änderung oder Implementierung muss das folgende Repository analysiert werden:
+Repository-URL: https://github.com/axel0681xaddy/Ressourcen-Imperium-1.git
+
+ANALYSE-RICHTLINIEN:
+1. Aktuellen Stand des Repositories prüfen
+2. Vorhandene Dateien und deren Inhalt analysieren
+3. Bestehende Implementierungen berücksichtigen
+4. Änderungen auf Basis des aktuellen Codes vorschlagen
+5. Bei Code-Änderungen immer den kompletten, aktualisierten Dateiinhalt bereitstellen
+6. Änderungen so beschreiben, dass sie direkt im Repository umgesetzt werden können
+MODULARE ENTWICKLUNG UND CODE-ORGANISATION:
+
+1. Dateigrößen-Richtlinien:
+- JavaScript-Dateien: Maximal 500 Zeilen pro Datei
+- CSS-Dateien: Maximal 300 Zeilen pro Datei
+- HTML-Dateien: Maximal 200 Zeilen pro Datei
+
+2. Modularisierungsprinzipien:
+- Große Klassen in kleinere, spezialisierte Klassen aufteilen
+- Funktionalitäten in separate Module auslagern
+- Wiederverwendbare Komponenten erstellen
+- Gemeinsame Funktionen in Utility-Klassen auslagern
+
+3. Vorgeschlagene Modulstruktur:
+/Game2/
+├── assets/
+│   ├── css/
+│   │   ├── styles.css           # Hauptstylesheet
+│   │   ├── components.css       # Wiederverwendbare UI-Komponenten
+│   │   └── themes.css           # Farbschema und Theming
+│   └── js/
+│       ├── app.js              # Hauptanwendung (max 500 Zeilen)
+│       ├── gameConfig.js       # Spielkonfiguration
+│       ├── modules/
+│       │   ├── resources.js    # Ressourcenverwaltung
+│       │   ├── buildings.js    # Gebäudeverwaltung
+│       │   ├── upgrades.js     # Upgrade-System
+│       │   ├── achievements.js  # Achievement-System
+│       │   └── storage.js      # Speicherverwaltung
+│       └── utils/
+│           ├── calculations.js  # Berechnungsfunktionen
+│           ├── ui.js           # UI-Hilfsfunktionen
+│           └── notifications.js # Benachrichtigungssystem
+
+4. Code-Aufteilung bei Überschreitung der Größenlimits:
+- Identifizierung zusammengehöriger Funktionalitäten
+- Erstellung neuer spezialisierter Module
+- Anpassung der Import/Export-Strukturen
+- Aktualisierung der Dokumentation
+
+5. Modularisierungskriterien:
+- Einzelne Verantwortlichkeit pro Modul
+- Geringe Kopplung zwischen Modulen
+- Hohe Kohäsion innerhalb der Module
+- Klare Schnittstellen zwischen Modulen
+- Wiederverwendbarkeit der Komponenten
+
+6. Vorgehen bei Änderungen:
+- Prüfen, ob bestehende Module betroffen sind
+- Evaluieren, ob neue Module erforderlich sind
+- Sicherstellen, dass Größenlimits eingehalten werden
+- Dokumentation der Modulabhängigkeiten
+- Testen der Modulinteraktionen
+
+KERNKOMPONENTEN:
+
+1. index.html
+- Enthält die Grundstruktur des Spiels
+- Implementiert das UI mit Ressourcenanzeigen, Gebäuden, Upgrades und Achievements
+- Lädt die JavaScript-Module und CSS
+- Enthält Error-Handling für das Laden
+- Responsive Design für Mobile und Desktop
+
+2. styles.css
+- Definiert das visuelle Layout des Spiels
+- Verwendet CSS-Variablen für Theming
+- Implementiert Responsive Design
+- Enthält Animationen und Transitions
+- Modales System für Einstellungen
+- Styling für Speicherlimit-Anzeigen und Warnungen
+SPIELMECHANIKEN:
+
+1. Ressourcen:
+- Holz (Basis-Ressource, Start-Limit: 100)
+- Stein (Fortgeschrittene Ressource, Start-Limit: 50)
+Jede Ressource hat:
+- Aktuelle Menge
+- Produktionsrate
+- Maximale Speicherkapazität
+- Warnungen bei Speicherlimit
+
+2. Gebäude:
+- Holzfäller (startet bei Level 1, produziert 0.5 Holz/s)
+- Steinbruch (kostet nur Holz, produziert 0.3 Stein/s)
+Jedes Gebäude hat:
+- Level
+- Basis-Kosten
+- Produktionsrate
+- Kosten-Multiplikator pro Level
+
+3. Upgrades:
+- Bessere Werkzeuge (erhöht Produktion um 50%)
+- Größerer Speicher (verdoppelt Speicherkapazität)
+Jedes Upgrade hat:
+- Einmalige Kosten
+- Sofortige Effekte
+- Permanente Verbesserungen
+
+4. Achievements:
+- Holzsammler (1000 Holz produziert)
+- Steinmeister (500 Stein produziert)
+Jedes Achievement hat:
+- Fortschrittsbedingungen
+- Belohnungen
+- Fortschrittsanzeige
+
+SPEICHERSYSTEM:
+- Verwendet LocalStorage für Spielstandspeicherung
+- Automatisches Speichern alle 60 Sekunden
+- Manuelles Speichern über Speichern-Button
+- Automatisches Laden beim Spielstart
+- Speichert alle relevanten Spielwerte:
+  * Ressourcenmengen und Limits
+  * Gebäudelevel und Produktionsraten
+  * Gekaufte Upgrades
+  * Errungenschaften
+  * Spielzeit und Gesamtproduktion
+
+UI-KOMPONENTEN:
+1. Header:
+- Ressourcenanzeigen mit:
+  * Aktuelle Menge
+  * Maximale Speicherkapazität
+  * Produktionsrate pro Sekunde
+- Einstellungen-Button
+- Speichern-Button
+- Farbliche Warnungen bei Speicherlimit
+
+2. Hauptbereich:
+- Gebäude-Grid mit:
+  * Gebäudelevel
+  * Aktuelle Kosten
+  * Produktionsraten
+  * Upgrade-Buttons
+- Upgrade-Liste mit:
+  * Kosten
+  * Effektbeschreibung
+  * Kauf-Buttons
+- Achievement-Grid mit Fortschrittsanzeigen
+
+3. Footer:
+- Spielzeit-Anzeige
+- Gesamtproduktion
+- Versionsinfo
+
+4. Benachrichtigungssystem:
+- Speicherlimit-Warnungen
+- Erfolgsmeldungen
+- Fehlermeldungen
+- Upgrade-Bestätigungen
+ERWEITERUNGSMÖGLICHKEITEN:
+1. Neue Ressourcen:
+- Implementierung in gameConfig.js
+- UI-Erweiterung in index.html
+- Produktionslogik in app.js
+- Anpassung der Speicherlimits
+
+2. Neue Gebäude:
+- Definition in gameConfig.js
+- UI-Element in index.html
+- Produktionslogik in app.js
+- Kostenbalancing
+
+3. Neue Upgrades:
+- Konfiguration in gameConfig.js
+- UI-Integration
+- Effekt-Implementation in app.js
+- Kostenbalancing
+
+4. Spielerweiterungen:
+- Prestige-System
+- Achievements mit Boni
+- Offline-Progression
+- Spielstand Export/Import
+
+BEKANNTE LIMITIERUNGEN:
+- Keine Multiplayer-Funktionalität
+- Begrenzte Offline-Progression
+- Keine Server-seitige Validierung
+- Speicherstand ist Browser-spezifisch
+- Kein Export/Import von Spielständen
+
+ENTWICKLUNGSRICHTLINIEN:
+1. Code-Stil:
+- ES6+ Module
+- Klassen für Hauptkomponenten
+- Dokumentierte Funktionen
+- Konsistente Benennung
+- Einheitliche Groß-/Kleinschreibung bei Ressourcennamen
+
+2. Performance:
+- RequestAnimationFrame für UI-Updates
+- Debouncing für häufige Events
+- Effiziente DOM-Manipulationen
+- Optimierte Speicherverwaltung
+
+3. Sicherheit:
+- Input-Validierung
+- Sichere LocalStorage-Nutzung
+- Content Security Policy
+- Spielstand-Validierung
+
+DEBUGGING:
+Zugriff auf Spielinstanz über Konsole:
+window.game.resources  // Ressourcen anzeigen
+window.game.buildings  // Gebäude anzeigen
+window.game.upgrades   // Upgrades anzeigen
+
+TEST-BEFEHLE:
+game.resources.wood.amount += 1000  // Holz hinzufügen
+game.resources.wood.maxStorage *= 2  // Speicherlimit verdoppeln
+game.saveGame()                     // Spiel speichern
+localStorage.clear()                // Spielstand zurücksetzen
+
+SPIELBALANCE:
+1. Startbedingungen:
+- 1 Holzfäller (Level 1)
+- 0.5 Holz/s Produktion
+- 100 Holz Speicherlimit
+- 50 Stein Speicherlimit
+
+2. Erste Upgrades:
+- Größerer Speicher: 90 Holz, 45 Stein
+- Bessere Werkzeuge: 100 Holz, 50 Stein
+
+3. Gebäudekosten:
+- Holzfäller: 10 Holz (×1.15 pro Level)
+- Steinbruch: 50 Holz (×1.15 pro Level)
+
+4. Produktionsraten:
+- Holzfäller: 0.5 Holz/s
+- Steinbruch: 0.3 Stein/s
